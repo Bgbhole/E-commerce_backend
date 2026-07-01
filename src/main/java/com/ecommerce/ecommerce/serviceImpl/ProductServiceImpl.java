@@ -11,12 +11,17 @@ import com.ecommerce.ecommerce.entity.Seller;
 import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.SellerRepository;
 import com.ecommerce.ecommerce.service.ProductService;
+import com.ecommerce.ecommerce.enums.ProductStatus;
+import com.ecommerce.ecommerce.enums.SellerStatus;
+
 
 @Service
 	public class ProductServiceImpl implements ProductService {
 
 	    @Autowired
 	    private ProductRepository productRepository;
+	    
+	    
 	    
 	    @Autowired
 	    private SellerRepository sellerRepository;
@@ -25,8 +30,13 @@ import com.ecommerce.ecommerce.service.ProductService;
 	        return productRepository.save(product);
 	    }
 
+	    @Override
 	    public List<Product> getAllProducts() {
-	        return productRepository.findAll();
+
+	        return productRepository.findByStatusAndSellerStatus(
+	                ProductStatus.ACTIVE,
+	                SellerStatus.ACTIVE
+	        );
 	    }
 	    
 	    @Override

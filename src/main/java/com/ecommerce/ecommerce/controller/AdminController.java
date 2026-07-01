@@ -1,43 +1,86 @@
 package com.ecommerce.ecommerce.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.ecommerce.ecommerce.dto.AdminDashboardDTO;
 import com.ecommerce.ecommerce.entity.Admin;
-import com.ecommerce.ecommerce.repository.AdminRepository;
+import com.ecommerce.ecommerce.entity.Product;
+import com.ecommerce.ecommerce.entity.Seller;
+import com.ecommerce.ecommerce.service.AdminService;
 
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin("*")
 public class AdminController {
 
-@Autowired
-private AdminRepository adminRepository;
+    @Autowired
+    private AdminService adminService;
 
-@PostMapping("/register")
-public Admin registerAdmin(
-        @RequestBody Admin admin) {
+    @GetMapping("/dashboard")
+    public AdminDashboardDTO dashboard() {
 
-    return adminRepository.save(admin);
-}
+        return adminService.getDashboard();
 
-@PostMapping("/login")
-public Admin loginAdmin(
-        @RequestBody Admin admin) {
-
-    Admin existingAdmin =
-            adminRepository.findByEmail(
-                    admin.getEmail());
-
-    if (existingAdmin != null &&
-            existingAdmin.getPassword()
-                    .equals(admin.getPassword())) {
-
-        return existingAdmin;
     }
 
-    return null;
-}
+    @GetMapping("/pending-sellers")
+    public List<Seller> pendingSellers() {
 
+        return adminService.getPendingSellers();
 
+    }
+    
+    @PutMapping("/approve-seller/{sellerId}")
+    public String approveSeller(
+            @PathVariable Long sellerId) {
+
+        return adminService.approveSeller(sellerId);
+
+    }
+    
+    @PutMapping("/reject-seller/{sellerId}")
+    public String rejectSeller(
+            @PathVariable Long sellerId) {
+
+        return adminService.rejectSeller(sellerId);
+
+    }
+    
+    
+    @GetMapping("/pending-products")
+    public List<Product> pendingProducts() {
+
+        return adminService.getPendingProducts();
+
+    }
+    
+    @PutMapping("/approve-product/{productId}")
+    public String approveProduct(
+            @PathVariable Long productId) {
+
+        return adminService.approveProduct(productId);
+
+    }
+    
+    @PutMapping("/reject-product/{productId}")
+    public String rejectProduct(
+            @PathVariable Long productId) {
+
+        return adminService.rejectProduct(productId);
+
+    }
+    
+    
+    @PostMapping("/login")
+    public Admin login(@RequestBody Admin admin) {
+
+        return adminService.login(
+                admin.getEmail(),
+                admin.getPassword());
+
+    }
+    
 }

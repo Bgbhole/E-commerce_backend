@@ -3,6 +3,8 @@ package com.ecommerce.ecommerce.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -31,13 +33,17 @@ public class User {
     @Column(unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private String mobile;
 
     private String role;
     
+    @JsonIgnore
     private String otp;
+    
+    @JsonIgnore
     private LocalDateTime otpExpiry;
 
     public User() {

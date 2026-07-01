@@ -4,6 +4,7 @@ package com.ecommerce.ecommerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.dto.SellerChangePasswordDTO;
@@ -17,6 +18,9 @@ import com.ecommerce.ecommerce.service.SellerService;
 @CrossOrigin("*")
 public class SellerController {
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
     @Autowired
     private SellerService sellerService;
 
@@ -194,7 +198,9 @@ public class SellerController {
             return "Invalid OTP";
         }
 
-        seller.setPassword(request.getNewPassword());
+        seller.setPassword(
+        	    passwordEncoder.encode(request.getNewPassword())
+        	);
 
         seller.setOtp(null);
 

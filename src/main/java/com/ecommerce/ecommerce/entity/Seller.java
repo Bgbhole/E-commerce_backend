@@ -1,12 +1,20 @@
 package com.ecommerce.ecommerce.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import com.ecommerce.ecommerce.enums.SellerStatus;
 
 @Entity
 @Table(name="sellers")
@@ -59,7 +67,24 @@ public class Seller {
 	    private String otp;
 	    private  LocalDateTime otpExpiry;
 
-	    private String status = "PENDING";
+	   
+	    
+	    
+	    @Enumerated(EnumType.STRING)
+	    private SellerStatus status;
+	    
+	    
+	    @OneToMany(mappedBy="seller")
+	    @JsonIgnore
+	    private List<Product> products;
+
+		public List<Product> getProducts() {
+			return products;
+		}
+
+		public void setProducts(List<Product> products) {
+			this.products = products;
+		}
 
 		public Long getSellerId() {
 			return sellerId;
@@ -229,11 +254,13 @@ public class Seller {
 			this.upiId = upiId;
 		}
 
-		public String getStatus() {
+	
+		
+		public SellerStatus getStatus() {
 			return status;
 		}
 
-		public void setStatus(String status) {
+		public void setStatus(SellerStatus status) {
 			this.status = status;
 		}
 

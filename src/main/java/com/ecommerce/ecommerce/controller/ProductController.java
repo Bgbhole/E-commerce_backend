@@ -24,6 +24,7 @@ import java.nio.file.StandardCopyOption;
 
 import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.entity.Seller;
+import com.ecommerce.ecommerce.enums.ProductStatus;
 import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.SellerRepository;
 import com.ecommerce.ecommerce.service.ProductService;
@@ -54,7 +55,13 @@ public class ProductController {
             @RequestParam("gstPercentage") double gstPercentage,
             @RequestParam("quantity") int quantity,
             @RequestParam("sellerId") Long sellerId,
-            @RequestParam("image") MultipartFile image)
+            @RequestParam("image") MultipartFile image,
+              @RequestParam("color") String color,
+              @RequestParam("weight") String weight,
+              @RequestParam("warranty") String warranty,
+              @RequestParam("model") String model,
+             @RequestParam("size") String size,
+             @RequestParam("material") String material)
 
     throws Exception {
 
@@ -85,7 +92,7 @@ public class ProductController {
         product.setQuantity(quantity);
         if (!image.isEmpty()) {
 
-            Path uploadDir = Paths.get("src/main/resources/static/images");
+        	Path uploadDir = Paths.get("uploads");
 
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
@@ -105,13 +112,36 @@ public class ProductController {
             );
 
             product.setImage(fileName);
+            
         }
             
-
+        product.setColor(color);
+        product.setWeight(weight);
+        product.setWarranty(warranty);
+        product.setModel(model);
+        product.setSize(size);
+        product.setMaterial(material);
+        
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("Seller not found"));
 
         product.setSeller(seller);
+        
+        product.setStatus(ProductStatus.PENDING);
+        
+        System.out.println("Color = " + color);
+        System.out.println("Weight = " + weight);
+        System.out.println("Warranty = " + warranty);
+        System.out.println("Model = " + model);
+        System.out.println("Size = " + size);
+        System.out.println("Material = " + material);
+
+        System.out.println("Product Color = " + product.getColor());
+        System.out.println("Product Weight = " + product.getWeight());
+        System.out.println("Product Warranty = " + product.getWarranty());
+        System.out.println("Product Model = " + product.getModel());
+        System.out.println("Product Size = " + product.getSize());
+        System.out.println("Product Material = " + product.getMaterial());
 
         return productRepository.save(product);
     }
@@ -130,11 +160,39 @@ public class ProductController {
         Product product = productRepository.findById(id).orElseThrow();
 
         product.setProductName(updatedProduct.getProductName());
+        product.setBrand(updatedProduct.getBrand());
+        product.setCategory(updatedProduct.getCategory());
         product.setDescription(updatedProduct.getDescription());
+
+        product.setPurchasePrice(updatedProduct.getPurchasePrice());
         product.setSellingPrice(updatedProduct.getSellingPrice());
+        product.setGstPercentage(updatedProduct.getGstPercentage());
+        
+        // Calculate Profit
+        double profit =
+                updatedProduct.getSellingPrice() -
+                updatedProduct.getPurchasePrice();
+
+        product.setProfit(profit);
+
+        // Calculate GST Amount
+        double gstAmount =
+                (updatedProduct.getSellingPrice()
+                * updatedProduct.getGstPercentage()) / 100;
+
+        product.setGstAmount(gstAmount);
+
+        // Calculate Final Price
+        double finalPrice =
+                updatedProduct.getSellingPrice() + gstAmount;
+
+        product.setFinalPrice(finalPrice);
+
         product.setQuantity(updatedProduct.getQuantity());
 
         return productRepository.save(product);
+
+     
     }
     
     @DeleteMapping("/delete/{id}")
@@ -161,6 +219,8 @@ public class ProductController {
                 .orElseThrow(() ->
                 new RuntimeException("Product not found"));
     }
+    
+  
 }
 
 

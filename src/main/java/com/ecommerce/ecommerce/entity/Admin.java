@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,8 @@ private String lastName;
 private String companyIdNumber;
 private String email;
 private String mobile;
+
+@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 private String password;
 
 public Long getAdminId() {

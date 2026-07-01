@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.ecommerce.dto.LoginRequest;
@@ -15,6 +16,8 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired private PasswordEncoder passwordEncoder;
+    
     @Override
     public User register(RegisterRequest request) {
 
@@ -24,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
         user.setLastName(request.getLastname());
         user.setEmail(request.getEmail());
         user.setMobile(request.getMobile());
-        user.setPassword(request.getPassword());
+        user.setPassword( passwordEncoder.encode(request.getPassword()) );
         user.setRole(request.getRole());
 
         return userRepository.save(user);
@@ -33,14 +36,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User login(LoginRequest request) {
 
-        User user = userRepository.findByEmailAndPassword(
-                request.getEmail(),
-                request.getPassword());
-
-        if (user == null) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
+    	User user = userRepository .findByEmail(request.getEmail()) .orElseThrow(() -> new RuntimeException("Invalid Email"));
+    	if (!passwordEncoder.matches( request.getPassword(), user.getPassword())) { throw new RuntimeException("Invalid Password"); }
         return user;
     }
 }

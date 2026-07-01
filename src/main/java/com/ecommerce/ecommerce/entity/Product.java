@@ -2,6 +2,8 @@ package com.ecommerce.ecommerce.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.ecommerce.ecommerce.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "products")
@@ -62,10 +67,31 @@ public class Product {
 
     private String material;
     
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+    
+    
 
     @ManyToOne
-    @JoinColumn(name = "seller_id")
+    @JoinColumn(name="seller_id")
+    @JsonIgnoreProperties({
+        "products",
+        "password",
+        "otp",
+        "otpExpiry"
+    })
     private Seller seller;
+    
+    
+    
+    
+	public ProductStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ProductStatus status) {
+		this.status = status;
+	}
 
 	public Long getProductId() {
 		return productId;
@@ -135,8 +161,20 @@ public class Product {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+	public void setQuantity(int quantity){
+
+	    this.quantity = quantity;
+
+	    if(quantity <= 0){
+
+	        this.status = ProductStatus.OUT_OF_STOCK;
+
+	    }else{
+
+	        this.status = ProductStatus.ACTIVE;
+
+	    }
+
 	}
 
 	public double getGstPercentage() {
