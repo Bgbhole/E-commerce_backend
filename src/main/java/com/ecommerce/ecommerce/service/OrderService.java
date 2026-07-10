@@ -17,5 +17,13 @@ public interface OrderService {
 
 	    Order cancelOrder(Long orderId);
 
+
+		List<Order> getAllOrders();
+
+		Order updateOrder(Long orderId, Order order);
+
+
+		
+
 	
 }

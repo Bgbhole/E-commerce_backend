@@ -13,6 +13,7 @@ import com.ecommerce.ecommerce.entity.User;
 import com.ecommerce.ecommerce.repository.AddressRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private AddressRepository addressRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void sendOtp(OtpRequest request) {
@@ -54,23 +58,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String changePassword(Long userId,
-                                 String oldPassword,
                                  String newPassword) {
-
-        System.out.println("UserId = " + userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        System.out.println("DB Password = " + user.getPassword());
+        user.setPassword(passwordEncoder.encode(newPassword));
 
-        if (!user.getPassword().equals(oldPassword)) {
-
-            return "Old password incorrect";
-
-        }
-
-        user.setPassword(newPassword);
+        // Clear OTP after successful password change
+        user.setOtp(null);
+        user.setOtpExpiry(null);
 
         userRepository.save(user);
 

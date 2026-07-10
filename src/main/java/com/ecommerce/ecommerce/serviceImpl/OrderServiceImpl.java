@@ -59,40 +59,47 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderTrackingRepository orderTrackingRepository;
-
     @Override
+    @Transactional
     public Order placeOrder(PlaceOrderRequest request) {
+
+        System.out.println("========== PLACE ORDER ==========");
+        System.out.println("UserId = " + request.getUserId());
+        System.out.println("DeliveryAddressId = " + request.getDeliveryAddressId());
+        System.out.println("BillingAddressId = " + request.getBillingAddressId());
+        System.out.println("PaymentMethod = " + request.getPaymentMethod());
+
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Address deliveryAddress = addressRepository
-                .findById(request.getDeliveryAddressId())
+        Address deliveryAddress = addressRepository.findById(request.getDeliveryAddressId())
                 .orElseThrow(() -> new RuntimeException("Delivery Address not found"));
 
-        System.out.println("User ID = " + user.getId());
+        Address billingAddress = addressRepository.findById(request.getBillingAddressId())
+                .orElse(deliveryAddress);
 
         List<Cart> cartItems = cartRepository.findByUserId(user.getId());
 
-        System.out.println("Cart Size = " + cartItems.size());
-
-        for (Cart c : cartItems) {
-            System.out.println(
-                "Cart -> user=" + c.getUser().getId()
-                + ", product=" + c.getProduct().getProductId()
-                + ", qty=" + c.getQuantity()
-            );
-        }
-
-        // Continue using the same cartItems variable
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
-       
+        Seller seller = cartItems.get(0).getProduct().getSeller();
+
+        if (seller == null) {
+            throw new RuntimeException("Seller not found");
+        }
+
         Order order = new Order();
 
         order.setUser(user);
-        order.setSeller(cartItems.get(0).getProduct().getSeller());
+
+        order.setSeller(seller);
+
+        order.setSellerName(seller.getName());
+        order.setSellerEmail(seller.getEmail());
+        order.setSellerMobile(seller.getMobile());
+        order.setShopName(seller.getShopName());
 
         order.setOrderDate(LocalDateTime.now());
 
@@ -100,10 +107,15 @@ public class OrderServiceImpl implements OrderService {
 
         order.setPaymentMethod(request.getPaymentMethod());
 
-        order.setPaymentStatus("SUCCESS");
+        if ("COD".equalsIgnoreCase(request.getPaymentMethod())) {
+            order.setPaymentStatus("PENDING");
+        } else {
+            order.setPaymentStatus("SUCCESS");
+        }
 
         order.setTrackingNumber(System.currentTimeMillis());
 
+        // Delivery Address
         order.setDeliveryName(deliveryAddress.getFullName());
         order.setDeliveryMobile(deliveryAddress.getMobile());
         order.setDeliveryAddress(deliveryAddress.getFullAddress());
@@ -111,69 +123,54 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryState(deliveryAddress.getState());
         order.setDeliveryPincode(deliveryAddress.getPincode());
 
-        double totalAmount = 0;
+        double total = 0;
 
         for (Cart cart : cartItems) {
-            totalAmount += cart.getProduct().getFinalPrice()
-                    * cart.getQuantity();
+            total += cart.getProduct().getFinalPrice() * cart.getQuantity();
         }
 
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(total);
 
         order = orderRepository.save(order);
-        
+
         for (Cart cart : cartItems) {
 
-        	OrderItem orderItem = new OrderItem();
+            Product product = cart.getProduct();
 
-        	Product product = cart.getProduct();
-
-        	orderItem.setOrder(order);
-
-        	// Keep reference to original product
-        	orderItem.setProduct(product);
-
-        	// =============================
-        	// Product Snapshot
-        	// =============================
-        	orderItem.setProductName(product.getProductName());
-        	orderItem.setBrand(product.getBrand());
-        	orderItem.setCategory(product.getCategory());
-        	orderItem.setImage(product.getImage());
-
-        	orderItem.setPurchasePrice(product.getPurchasePrice());
-        	orderItem.setSellingPrice(product.getSellingPrice());
-        	orderItem.setFinalPrice(product.getFinalPrice());
-
-        	orderItem.setGstPercentage(product.getGstPercentage());
-        	orderItem.setGstAmount(product.getGstAmount());
-
-        	orderItem.setProfit(product.getProfit());
-
-        	// =============================
-
-        	orderItem.setQuantity(cart.getQuantity());
-
-        	orderItem.setPrice(product.getFinalPrice());
-
-        	orderItemRepository.save(orderItem);
-
-        	int remainingStock =
-        	        product.getQuantity()
-        	        - cart.getQuantity();
-         
-
-            if (remainingStock < 0) {
+            if (product.getQuantity() < cart.getQuantity()) {
                 throw new RuntimeException(
-                        "Insufficient stock for "
-                                + product.getProductName());
+                        "Insufficient stock for " + product.getProductName());
             }
 
-            product.setQuantity(remainingStock);
+            OrderItem item = new OrderItem();
+
+            item.setOrder(order);
+            item.setProduct(product);
+
+            item.setProductName(product.getProductName());
+            item.setBrand(product.getBrand());
+            item.setCategory(product.getCategory());
+            item.setImage(product.getImage());
+
+            item.setPurchasePrice(product.getPurchasePrice());
+            item.setSellingPrice(product.getSellingPrice());
+            item.setFinalPrice(product.getFinalPrice());
+
+            item.setGstPercentage(product.getGstPercentage());
+            item.setGstAmount(product.getGstAmount());
+
+            item.setProfit(product.getProfit());
+
+            item.setQuantity(cart.getQuantity());
+            item.setPrice(product.getFinalPrice());
+
+            orderItemRepository.save(item);
+
+            product.setQuantity(product.getQuantity() - cart.getQuantity());
 
             productRepository.save(product);
 
-            order.getOrderItems().add(orderItem);
+            order.getOrderItems().add(item);
         }
 
         OrderTracking tracking = new OrderTracking();
@@ -307,9 +304,55 @@ public class OrderServiceImpl implements OrderService {
         return sellerCartMap;
 
     }
+
+
+
+    @Override
+    public List<Order> getAllOrders() {
+
+        return orderRepository.findAll();
+
+    }
     
-    
-    
+    @Override
+    @Transactional
+    public Order updateOrder(Long orderId, Order request) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Order Not Found"));
+
+        // Update Order
+        order.setDeliveryName(request.getDeliveryName());
+        order.setDeliveryMobile(request.getDeliveryMobile());
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setDeliveryCity(request.getDeliveryCity());
+        order.setDeliveryState(request.getDeliveryState());
+        order.setDeliveryPincode(request.getDeliveryPincode());
+
+        orderRepository.save(order);
+
+        // Update Customer Address
+        User user = order.getUser();
+
+        List<Address> addresses = addressRepository.findByUserId(user.getId());
+
+        if (!addresses.isEmpty()) {
+
+            Address address = addresses.get(0);
+
+            address.setFullName(request.getDeliveryName());
+            address.setMobile(request.getDeliveryMobile());
+            address.setFullAddress(request.getDeliveryAddress());
+            address.setCity(request.getDeliveryCity());
+            address.setState(request.getDeliveryState());
+            address.setPincode(request.getDeliveryPincode());
+
+            addressRepository.save(address);
+        }
+
+        return order;
+    }
     
     
     

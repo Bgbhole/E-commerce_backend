@@ -13,7 +13,6 @@ public interface UserService {
     boolean verifyOtp(Long userId, String otp);
 
     String changePassword(Long userId,
-                          String oldPassword,
                           String newPassword);
 
 	List<User> getAllUsers();
