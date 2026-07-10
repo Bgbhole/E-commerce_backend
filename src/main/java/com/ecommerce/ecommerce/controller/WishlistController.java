@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.entity.Wishlist;
+import com.ecommerce.ecommerce.repository.WishlistRepository;
 import com.ecommerce.ecommerce.service.WishlistService;
 
 @RestController
@@ -15,6 +16,10 @@ public class WishlistController {
 
     @Autowired
     private WishlistService wishlistService;
+    
+    @Autowired
+    private WishlistRepository WishlistRepository;
+    
 
     // Add Product
     @PostMapping("/add")
@@ -46,4 +51,17 @@ public class WishlistController {
 
     }
 
-}
+    @DeleteMapping("/remove")
+    public String removeWishlist(
+            @RequestParam Long userId,
+            @RequestParam Long productId){
+
+        Wishlist wishlist = WishlistRepository
+                .findByUserIdAndProductProductId(userId, productId)
+                .orElseThrow(() -> new RuntimeException("Wishlist not found"));
+
+        WishlistRepository.delete(wishlist);
+
+        return "Removed";
+    }
+    }

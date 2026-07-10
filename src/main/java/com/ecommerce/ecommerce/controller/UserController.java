@@ -79,13 +79,8 @@ public class UserController {
     public String changePassword(
             @RequestBody PasswordRequestDTO request){
 
-        System.out.println("UserId = " + request.getUserId());
-        System.out.println("Old Password = " + request.getOldPassword());
-        System.out.println("New Password = " + request.getNewPassword());
-
         return userService.changePassword(
                 request.getUserId(),
-                request.getOldPassword(),
                 request.getNewPassword());
 
     }

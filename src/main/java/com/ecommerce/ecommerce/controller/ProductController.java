@@ -1,6 +1,5 @@
 package com.ecommerce.ecommerce.controller;
 
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.StandardCopyOption;
 
-
 import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.entity.Seller;
 import com.ecommerce.ecommerce.enums.ProductStatus;
@@ -34,193 +32,300 @@ import com.ecommerce.ecommerce.service.ProductService;
 @CrossOrigin("*")
 public class ProductController {
 
-    @Autowired
-    private ProductRepository productRepository;
+	@Autowired
+	private ProductRepository productRepository;
 
-    @Autowired
-    private ProductService productService;
-    
-    @Autowired
-    private SellerRepository sellerRepository;
+	@Autowired
+	private ProductService productService;
 
-    @PostMapping(value="/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Product addProduct(
+	@Autowired
+	private SellerRepository sellerRepository;
 
-            @RequestParam("productName") String productName,
-            @RequestParam("brand") String brand,
-            @RequestParam("category") String category,
-            @RequestParam("description") String description,
-            @RequestParam("purchasePrice") double purchasePrice,
-            @RequestParam("sellingPrice") double sellingPrice,
-            @RequestParam("gstPercentage") double gstPercentage,
-            @RequestParam("quantity") int quantity,
-            @RequestParam("sellerId") Long sellerId,
-            @RequestParam("image") MultipartFile image,
-              @RequestParam("color") String color,
-              @RequestParam("weight") String weight,
-              @RequestParam("warranty") String warranty,
-              @RequestParam("model") String model,
-             @RequestParam("size") String size,
-             @RequestParam("material") String material)
+	@PostMapping(value = "/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Product addProduct(
 
-    throws Exception {
+			@RequestParam("productName") String productName, @RequestParam("brand") String brand,
+			@RequestParam("category") String category, @RequestParam("description") String description,
+			@RequestParam("purchasePrice") double purchasePrice, @RequestParam("sellingPrice") double sellingPrice,
+			@RequestParam("gstPercentage") double gstPercentage, @RequestParam("quantity") int quantity,
+			@RequestParam("sellerId") Long sellerId,
+			@RequestParam(value = "image", required = false) MultipartFile image,
+			@RequestParam(value = "image2", required = false) MultipartFile image2,
+			@RequestParam(value = "image3", required = false) MultipartFile image3,
+			@RequestParam(value = "image4", required = false) MultipartFile image4,
+			@RequestParam(value = "color", required = false) String color,
+			@RequestParam(value = "weight", required = false) String weight,
+			@RequestParam(value = "warranty", required = false) String warranty,
+			@RequestParam(value = "model", required = false) String model,
+			@RequestParam(value = "size", required = false) String size,
+			@RequestParam(value = "material", required = false) String material,
+			@RequestParam(value = "ram", required = false) String ram,
+			@RequestParam(value = "storage", required = false) String storage,
+			@RequestParam(value = "processor", required = false) String processor,
+			@RequestParam(value = "battery", required = false) String battery,
+			@RequestParam(value = "camera", required = false) String camera,
+			@RequestParam(value = "display", required = false) String display,
+			@RequestParam(value = "operatingSystem", required = false) String operatingSystem,
+			@RequestParam(value = "network", required = false) String network,
 
-        Product product = new Product();
+			@RequestParam(value = "voltage", required = false) String voltage,
+			@RequestParam(value = "power", required = false) String power,
+			@RequestParam(value = "connectivity", required = false) String connectivity,
 
-        product.setProductName(productName);
-        product.setBrand(brand);
-        product.setCategory(category);
-        product.setDescription(description);
+			@RequestParam(value = "fabric", required = false) String fabric,
+			@RequestParam(value = "gender", required = false) String gender,
+			@RequestParam(value = "fit", required = false) String fit,
+			@RequestParam(value = "pattern", required = false) String pattern,
+			@RequestParam(value = "sleeve", required = false) String sleeve,
+			@RequestParam(value = "washCare", required = false) String washCare,
 
-        product.setPurchasePrice(purchasePrice);
-        product.setSellingPrice(sellingPrice);
+			@RequestParam(value = "dimensions", required = false) String dimensions,
+			@RequestParam(value = "finish", required = false) String finish,
+			@RequestParam(value = "assembly", required = false) String assembly,
+			@RequestParam(value = "roomType", required = false) String roomType,
 
-        // Profit
-        double profit = sellingPrice - purchasePrice;
-        product.setProfit(profit);
+			@RequestParam(value = "author", required = false) String author,
+			@RequestParam(value = "publisher", required = false) String publisher,
+			@RequestParam(value = "language", required = false) String language,
+			@RequestParam(value = "pages", required = false) String pages,
+			@RequestParam(value = "isbn", required = false) String isbn,
+			@RequestParam(value = "edition", required = false) String edition,
+			@RequestParam(value = "binding", required = false) String binding,
+			@RequestParam(value = "publicationYear", required = false) String publicationYear,
 
-        // GST
-        product.setGstPercentage(gstPercentage);
+			@RequestParam(value = "manufacturer", required = false) String manufacturer,
+			@RequestParam(value = "country", required = false) String country,
+			@RequestParam(value = "expiryDate", required = false) String expiryDate,
+			@RequestParam(value = "storageInstruction", required = false) String storageInstruction,
+			@RequestParam(value = "veg", required = false) String veg,
+			@RequestParam(value = "organic", required = false) String organic,
 
-        double gstAmount = (sellingPrice * gstPercentage) / 100;
-        product.setGstAmount(gstAmount);
+			@RequestParam(value = "skinType", required = false) String skinType,
+			@RequestParam(value = "hairType", required = false) String hairType,
+			@RequestParam(value = "ingredients", required = false) String ingredients,
+			@RequestParam(value = "benefits", required = false) String benefits,
+			@RequestParam(value = "netQuantity", required = false) String netQuantity,
 
-        // Final Price customer pays
-        double finalPrice = sellingPrice + gstAmount;
-        product.setFinalPrice(finalPrice);
+			@RequestParam(value = "sportType", required = false) String sportType,
+			@RequestParam(value = "ageGroup", required = false) String ageGroup,
 
-        product.setQuantity(quantity);
-        if (!image.isEmpty()) {
+			@RequestParam(value = "toyAge", required = false) String toyAge,
+			@RequestParam(value = "batteryRequired", required = false) String batteryRequired,
+			@RequestParam(value = "educational", required = false) String educational,
+			@RequestParam(value = "safety", required = false) String safety)
 
-        	Path uploadDir = Paths.get("uploads");
+			throws Exception {
 
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
+		Product product = new Product();
 
-            // Unique file name
-            String fileName =
-                    System.currentTimeMillis() + "_"
-                    + image.getOriginalFilename();
+		product.setProductName(productName);
+		product.setBrand(brand);
+		product.setCategory(category);
+		product.setDescription(description);
 
-            Path filePath = uploadDir.resolve(fileName);
+		product.setPurchasePrice(purchasePrice);
+		product.setSellingPrice(sellingPrice);
 
-            Files.copy(
-                    image.getInputStream(),
-                    filePath,
-                    StandardCopyOption.REPLACE_EXISTING
-            );
+		// Profit
+		double profit = sellingPrice - purchasePrice;
+		product.setProfit(profit);
 
-            product.setImage(fileName);
-            
-        }
-            
-        product.setColor(color);
-        product.setWeight(weight);
-        product.setWarranty(warranty);
-        product.setModel(model);
-        product.setSize(size);
-        product.setMaterial(material);
-        
-        Seller seller = sellerRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found"));
+		// GST
+		product.setGstPercentage(gstPercentage);
 
-        product.setSeller(seller);
-        
-        product.setStatus(ProductStatus.PENDING);
-        
-        System.out.println("Color = " + color);
-        System.out.println("Weight = " + weight);
-        System.out.println("Warranty = " + warranty);
-        System.out.println("Model = " + model);
-        System.out.println("Size = " + size);
-        System.out.println("Material = " + material);
+		double gstAmount = (sellingPrice * gstPercentage) / 100;
+		product.setGstAmount(gstAmount);
 
-        System.out.println("Product Color = " + product.getColor());
-        System.out.println("Product Weight = " + product.getWeight());
-        System.out.println("Product Warranty = " + product.getWarranty());
-        System.out.println("Product Model = " + product.getModel());
-        System.out.println("Product Size = " + product.getSize());
-        System.out.println("Product Material = " + product.getMaterial());
+		// Final Price customer pays
+		double finalPrice = sellingPrice + gstAmount;
+		product.setFinalPrice(finalPrice);
 
-        return productRepository.save(product);
-    }
-    
+		product.setQuantity(quantity);
+		product.setImage(saveImage(image));
+		product.setImage2(saveImage(image2));
+		product.setImage3(saveImage(image3));
+		product.setImage4(saveImage(image4));
 
-    @GetMapping("/all")
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
-    }
-    
-    @PutMapping("/update/{id}")
-    public Product updateProduct(
-            @PathVariable Long id,
-            @RequestBody Product updatedProduct){
+		product.setColor(color);
+		product.setWeight(weight);
+		product.setWarranty(warranty);
+		product.setModel(model);
+		product.setSize(size);
+		product.setMaterial(material);
+		product.setRam(ram);
+		product.setStorage(storage);
+		product.setProcessor(processor);
+		product.setBattery(battery);
+		product.setCamera(camera);
+		product.setDisplay(display);
+		product.setOperatingSystem(operatingSystem);
+		product.setNetwork(network);
 
-        Product product = productRepository.findById(id).orElseThrow();
+		product.setVoltage(voltage);
+		product.setPower(power);
+		product.setConnectivity(connectivity);
 
-        product.setProductName(updatedProduct.getProductName());
-        product.setBrand(updatedProduct.getBrand());
-        product.setCategory(updatedProduct.getCategory());
-        product.setDescription(updatedProduct.getDescription());
+		product.setFabric(fabric);
+		product.setGender(gender);
+		product.setFit(fit);
+		product.setPattern(pattern);
+		product.setSleeve(sleeve);
+		product.setWashCare(washCare);
 
-        product.setPurchasePrice(updatedProduct.getPurchasePrice());
-        product.setSellingPrice(updatedProduct.getSellingPrice());
-        product.setGstPercentage(updatedProduct.getGstPercentage());
-        
-        // Calculate Profit
-        double profit =
-                updatedProduct.getSellingPrice() -
-                updatedProduct.getPurchasePrice();
+		product.setDimensions(dimensions);
+		product.setFinish(finish);
+		product.setAssembly(assembly);
+		product.setRoomType(roomType);
 
-        product.setProfit(profit);
+		product.setAuthor(author);
+		product.setPublisher(publisher);
+		product.setLanguage(language);
+		product.setPages(pages);
+		product.setIsbn(isbn);
+		product.setEdition(edition);
+		product.setBinding(binding);
+		product.setPublicationYear(publicationYear);
 
-        // Calculate GST Amount
-        double gstAmount =
-                (updatedProduct.getSellingPrice()
-                * updatedProduct.getGstPercentage()) / 100;
+		product.setManufacturer(manufacturer);
+		product.setCountry(country);
+		product.setExpiryDate(expiryDate);
+		product.setStorageInstruction(storageInstruction);
+		product.setVeg(veg);
+		product.setOrganic(organic);
 
-        product.setGstAmount(gstAmount);
+		product.setSkinType(skinType);
+		product.setHairType(hairType);
+		product.setIngredients(ingredients);
+		product.setBenefits(benefits);
+		product.setNetQuantity(netQuantity);
 
-        // Calculate Final Price
-        double finalPrice =
-                updatedProduct.getSellingPrice() + gstAmount;
+		product.setSportType(sportType);
+		product.setAgeGroup(ageGroup);
 
-        product.setFinalPrice(finalPrice);
+		product.setToyAge(toyAge);
+		product.setBatteryRequired(batteryRequired);
+		product.setEducational(educational);
+		product.setSafety(safety);
 
-        product.setQuantity(updatedProduct.getQuantity());
+		Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found"));
 
-        return productRepository.save(product);
+		product.setSeller(seller);
 
-     
-    }
-    
-    @DeleteMapping("/delete/{id}")
-    public String deleteProduct(
-            @PathVariable Long id){
+		product.setStatus(ProductStatus.PENDING);
 
-        productRepository.deleteById(id);
+		System.out.println("Color = " + color);
+		System.out.println("Weight = " + weight);
+		System.out.println("Warranty = " + warranty);
+		System.out.println("Model = " + model);
+		System.out.println("Size = " + size);
+		System.out.println("Material = " + material);
+		System.out.println("Product Color = " + product.getColor());
+		System.out.println("Product Weight = " + product.getWeight());
+		System.out.println("Product Warranty = " + product.getWarranty());
+		System.out.println("Product Model = " + product.getModel());
+		System.out.println("Product Size = " + product.getSize());
+		System.out.println("Product Material = " + product.getMaterial());
 
-        return "Deleted";
-    }
-    
-    @GetMapping("/seller/{sellerId}")
-    public List<Product> getSellerProducts(
-            @PathVariable Long sellerId){
+		try {
 
-        return productRepository.findBySellerSellerId(sellerId);
+		    Product saved = productRepository.save(product);
 
-    }
-    
-    @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id){
+		    System.out.println("Saved Successfully");
 
-        return productRepository.findById(id)
-                .orElseThrow(() ->
-                new RuntimeException("Product not found"));
-    }
-    
-  
+		    return saved;
+
+		} catch (Exception e) {
+
+		    e.printStackTrace();
+
+		    throw e;
+
+		}
+	}
+
+	@GetMapping("/all")
+	public List<Product> getAllProducts() {
+		return productService.getAllProducts();
+	}
+
+	@PutMapping("/update/{id}")
+	public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+
+		Product product = productRepository.findById(id).orElseThrow();
+
+		product.setProductName(updatedProduct.getProductName());
+		product.setBrand(updatedProduct.getBrand());
+		product.setCategory(updatedProduct.getCategory());
+		product.setDescription(updatedProduct.getDescription());
+
+		product.setPurchasePrice(updatedProduct.getPurchasePrice());
+		product.setSellingPrice(updatedProduct.getSellingPrice());
+		product.setGstPercentage(updatedProduct.getGstPercentage());
+
+		// Calculate Profit
+		double profit = updatedProduct.getSellingPrice() - updatedProduct.getPurchasePrice();
+
+		product.setProfit(profit);
+
+		// Calculate GST Amount
+		double gstAmount = (updatedProduct.getSellingPrice() * updatedProduct.getGstPercentage()) / 100;
+
+		product.setGstAmount(gstAmount);
+
+		// Calculate Final Price
+		double finalPrice = updatedProduct.getSellingPrice() + gstAmount;
+
+		product.setFinalPrice(finalPrice);
+
+		product.setQuantity(updatedProduct.getQuantity());
+
+		return productRepository.save(product);
+
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public String deleteProduct(@PathVariable Long id) {
+
+		Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+
+		product.setStatus(ProductStatus.DELETED);
+
+		productRepository.save(product);
+
+		return "Deleted";
+	}
+
+	@GetMapping("/seller/{sellerId}")
+	public List<Product> getSellerProducts(@PathVariable Long sellerId) {
+
+		return productRepository.findBySellerSellerId(sellerId);
+
+	}
+
+	@GetMapping("/{id}")
+	public Product getProductById(@PathVariable Long id) {
+
+		return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+	}
+
+	private String saveImage(MultipartFile image) throws Exception {
+
+		if (image == null || image.isEmpty()) {
+			return null;
+		}
+
+		Path uploadDir = Paths.get("uploads");
+
+		if (!Files.exists(uploadDir)) {
+			Files.createDirectories(uploadDir);
+		}
+
+		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+
+		Path filePath = uploadDir.resolve(fileName);
+
+		Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+		return fileName;
+	}
 }
-
-

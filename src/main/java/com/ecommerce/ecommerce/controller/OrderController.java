@@ -48,5 +48,18 @@ public class OrderController {
     public Order cancelOrder(@PathVariable Long orderId) {
         return orderService.cancelOrder(orderId);
     }
+    @GetMapping
+    public List<Order> getAllOrders() {
 
+        return orderService.getAllOrders();
+
+    }
+    
+    @PutMapping("/update/{orderId}")
+    public Order updateOrder(
+            @PathVariable Long orderId,
+            @RequestBody Order order){
+
+        return orderService.updateOrder(orderId, order);
+    }
 }
