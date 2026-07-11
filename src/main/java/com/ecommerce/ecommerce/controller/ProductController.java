@@ -6,7 +6,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 
+import com.ecommerce.ecommerce.entity.DeletedProduct;
 import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.entity.Seller;
 import com.ecommerce.ecommerce.enums.ProductStatus;
+import com.ecommerce.ecommerce.repository.DeletedProductRepository;
 import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.SellerRepository;
 import com.ecommerce.ecommerce.service.ProductService;
@@ -40,6 +45,9 @@ public class ProductController {
 
 	@Autowired
 	private SellerRepository sellerRepository;
+	
+	@Autowired
+	private DeletedProductRepository deletedProductRepository;
 
 	@PostMapping(value = "/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Product addProduct(
@@ -140,11 +148,10 @@ public class ProductController {
 		double finalPrice = sellingPrice + gstAmount;
 		product.setFinalPrice(finalPrice);
 
-		product.setQuantity(quantity);
-		product.setImage(saveImage(image));
-		product.setImage2(saveImage(image2));
-		product.setImage3(saveImage(image3));
-		product.setImage4(saveImage(image4));
+		product.setImage(image != null && !image.isEmpty() ? image.getBytes() : null);
+		product.setImage2(image2 != null && !image2.isEmpty() ? image2.getBytes() : null);
+		product.setImage3(image3 != null && !image3.isEmpty() ? image3.getBytes() : null);
+		product.setImage4(image4 != null && !image4.isEmpty() ? image4.getBytes() : null);
 
 		product.setColor(color);
 		product.setWeight(weight);
@@ -286,20 +293,46 @@ public class ProductController {
 	@DeleteMapping("/delete/{id}")
 	public String deleteProduct(@PathVariable Long id) {
 
-		Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+	    Product product = productRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Product not found"));
 
-		product.setStatus(ProductStatus.DELETED);
+	    DeletedProduct deleted = new DeletedProduct();
 
-		productRepository.save(product);
+	    deleted.setOriginalProductId(product.getProductId());
+	    deleted.setProductName(product.getProductName());
+	    deleted.setBrand(product.getBrand());
+	    deleted.setCategory(product.getCategory());
 
-		return "Deleted";
+	    deleted.setImage(product.getImage());
+
+	    deleted.setPurchasePrice(product.getPurchasePrice());
+	    deleted.setSellingPrice(product.getSellingPrice());
+	    deleted.setFinalPrice(product.getFinalPrice());
+
+	    deleted.setQuantity(product.getQuantity());
+
+	    deleted.setDeletedAt(LocalDateTime.now());
+
+	    deleted.setSeller(product.getSeller());
+
+	    
+		// Save to deleted_products table
+	    deletedProductRepository.save(deleted);
+
+	    // Hide product from application
+	    product.setStatus(ProductStatus.DELETED);
+
+	    productRepository.save(product);
+
+	    return "Product moved to Deleted Products";
 	}
-
 	@GetMapping("/seller/{sellerId}")
 	public List<Product> getSellerProducts(@PathVariable Long sellerId) {
 
-		return productRepository.findBySellerSellerId(sellerId);
-
+	    return productRepository.findBySellerSellerIdAndStatus(
+	            sellerId,
+	            ProductStatus.ACTIVE
+	    );
 	}
 
 	@GetMapping("/{id}")
@@ -327,5 +360,15 @@ public class ProductController {
 		Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
 		return fileName;
+	}
+	
+
+
+	@GetMapping(value = "/image/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
+	public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+
+	    Product product = productRepository.findById(id).orElseThrow();
+
+	    return ResponseEntity.ok(product.getImage());
 	}
 }

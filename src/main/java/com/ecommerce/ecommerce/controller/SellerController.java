@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.dto.SellerChangePasswordDTO;
 import com.ecommerce.ecommerce.dto.VerifyOtpRequest;
+import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.entity.Seller;
+import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.SellerRepository;
 import com.ecommerce.ecommerce.service.SellerService;
 
@@ -26,6 +28,9 @@ public class SellerController {
 
     @Autowired
     private SellerRepository sellerRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
 
     // Register Seller
     @PostMapping("/register")
@@ -46,10 +51,10 @@ public class SellerController {
     }
 
     // Get Seller By Id
-    @GetMapping("/{sellerId}")
-    public Seller getSellerById(@PathVariable Long sellerId) {
+    @GetMapping("/seller/{sellerId}")
+    public List<Product> getSellerProducts(@PathVariable Long sellerId) {
 
-        return sellerRepository.findById(sellerId).orElse(null);
+        return productRepository.findBySellerSellerId(sellerId);
 
     }
 
