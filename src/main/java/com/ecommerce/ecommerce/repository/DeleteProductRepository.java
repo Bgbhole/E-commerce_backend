@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.ecommerce.ecommerce.entity.DeletedProduct;
 
 @Repository
-public interface DeletedProductRepository
-        extends JpaRepository<DeletedProduct, Long> {
+public interface DeletedProductRepository extends JpaRepository<DeletedProduct, Long> {
 
 }

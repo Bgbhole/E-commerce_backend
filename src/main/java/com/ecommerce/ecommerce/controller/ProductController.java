@@ -45,12 +45,10 @@ public class ProductController {
 
 	@Autowired
 	private SellerRepository sellerRepository;
-	
+
 	@Autowired
-	private DeletedProductRepository deletedProductRepository;
+	private DeletedProductRepository deletedproductRepository;
 	
-
-
 	@PostMapping(value = "/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Product addProduct(
 
@@ -318,8 +316,7 @@ public class ProductController {
 	    deleted.setSeller(product.getSeller());
 
 	    
-		// Save to deleted_products table
-	    deletedProductRepository.save(deleted);
+	    deletedproductRepository.save(deleted);
 
 	    // Hide product from application
 	    product.setStatus(ProductStatus.DELETED);
@@ -335,6 +332,7 @@ public class ProductController {
 	            sellerId,
 	            ProductStatus.ACTIVE
 	    );
+
 	}
 
 	@GetMapping("/{id}")
@@ -345,23 +343,23 @@ public class ProductController {
 
 	private String saveImage(MultipartFile image) throws Exception {
 
-		if (image == null || image.isEmpty()) {
-			return null;
-		}
+	    if (image == null || image.isEmpty()) {
+	        return null;
+	    }
 
-		Path uploadDir = Paths.get("uploads");
+	    Path uploadDir = Paths.get("uploads");
 
-		if (!Files.exists(uploadDir)) {
-			Files.createDirectories(uploadDir);
-		}
+	    if (!Files.exists(uploadDir)) {
+	        Files.createDirectories(uploadDir);
+	    }
 
-		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+	    String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
 
-		Path filePath = uploadDir.resolve(fileName);
+	    Path filePath = uploadDir.resolve(fileName);
 
-		Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+	    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-		return fileName;
+	    return fileName;
 	}
 	
 
