@@ -48,6 +48,8 @@ public class ProductController {
 	
 	@Autowired
 	private DeletedProductRepository deletedProductRepository;
+	
+
 
 	@PostMapping(value = "/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Product addProduct(
