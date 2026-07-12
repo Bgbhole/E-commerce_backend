@@ -8,13 +8,22 @@ import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.enums.ProductStatus;
 import com.ecommerce.ecommerce.enums.SellerStatus;
 
-public interface ProductRepository extends JpaRepository<Product,Long>{
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-	List<Product> findBySellerSellerId(Long sellerId);
-	List<Product> findByStatusAndSellerStatus(
-	        ProductStatus productStatus,
-	        SellerStatus sellerStatus);
-	List<Product> findByStatus(ProductStatus status);
-	long countByStatus(ProductStatus status);
-	
+    List<Product> findBySellerSellerId(Long sellerId);
+
+    List<Product> findBySellerSellerIdAndStatus(
+            Long sellerId,
+            ProductStatus status
+    );
+
+    List<Product> findByStatus(ProductStatus status);
+
+    List<Product> findByStatusAndSellerStatus(
+            ProductStatus productStatus,
+            SellerStatus sellerStatus
+    );
+
+    long countByStatus(ProductStatus status);
+
 }

@@ -46,12 +46,14 @@ public class AdminServiceImpl implements AdminService {
 
         AdminDashboardDTO dto = new AdminDashboardDTO();
 
+        long active = productRepository.countByStatus(ProductStatus.ACTIVE);
+
+        System.out.println("ACTIVE PRODUCTS = " + active);
+
+        dto.setTotalProducts(active);
+
         dto.setTotalUsers(userRepository.count());
-
         dto.setTotalSellers(sellerRepository.count());
-
-        dto.setTotalProducts(productRepository.count());
-
         dto.setTotalOrders(orderRepository.count());
 
         dto.setPendingSellers(
@@ -61,7 +63,6 @@ public class AdminServiceImpl implements AdminService {
                 productRepository.countByStatus(ProductStatus.PENDING));
 
         return dto;
-
     }
 
     

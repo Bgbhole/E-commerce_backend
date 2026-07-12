@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -51,10 +52,21 @@ public class Product {
 
     private double gstAmount;
 
-    private String image;
-    private String image2;
-    private String image3;
-    private String image4;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] image;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] image2;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] image3;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] image4;
   
     
     private double finalPrice;
@@ -257,37 +269,37 @@ public class Product {
 		this.gstAmount = gstAmount;
 	}
 
-	public String getImage() {
+
+
+	public byte[] getImage() {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(byte[] image) {
 		this.image = image;
 	}
-	
-	
 
-	public String getImage2() {
+	public byte[] getImage2() {
 		return image2;
 	}
 
-	public void setImage2(String image2) {
+	public void setImage2(byte[] image2) {
 		this.image2 = image2;
 	}
 
-	public String getImage3() {
+	public byte[] getImage3() {
 		return image3;
 	}
 
-	public void setImage3(String image3) {
+	public void setImage3(byte[] image3) {
 		this.image3 = image3;
 	}
 
-	public String getImage4() {
+	public byte[] getImage4() {
 		return image4;
 	}
 
-	public void setImage4(String image4) {
+	public void setImage4(byte[] image4) {
 		this.image4 = image4;
 	}
 
@@ -355,21 +367,7 @@ public class Product {
 		this.material = material;
 	}
 
-	public void setStock(int stock) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setImageUrl(Object imageUrl) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setName(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	public String getRam() {
 		return ram;
 	}

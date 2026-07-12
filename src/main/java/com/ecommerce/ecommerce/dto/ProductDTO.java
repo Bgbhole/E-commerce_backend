@@ -7,6 +7,7 @@ public class ProductDTO {
     private String description;
     private Integer quantity;
     private int stock;
+    private String category;
     private Long sellerId;
 	public String getName() {
 		return name;
@@ -45,13 +46,13 @@ public class ProductDTO {
 	public void setSellerId(Long sellerId) {
 		this.sellerId = sellerId;
 	}
-	public Object getImageUrl() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	public String getCategory() {
-		// TODO Auto-generated method stub
-		return null;
+	    return category;
+	}
+
+	public void setCategory(String category) {
+	    this.category = category;
 	}
     
     

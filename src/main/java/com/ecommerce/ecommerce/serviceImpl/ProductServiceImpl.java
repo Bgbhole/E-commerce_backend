@@ -47,14 +47,12 @@ import com.ecommerce.ecommerce.enums.SellerStatus;
 
 	        Product product = new Product();
 
-	        product.setName(dto.getName());
+	        product.setProductName(dto.getName());
 	        product.setDescription(dto.getDescription());
-	        product.setFinalPrice(dto.getPrice());
 	        product.setCategory(dto.getCategory());
-	        product.setImageUrl(dto.getImageUrl());
-	        product.setStock(dto.getStock());
+	        product.setFinalPrice(dto.getPrice());
+	        product.setQuantity(dto.getQuantity());
 
-	        // Associate seller
 	        product.setSeller(seller);
 
 	        return productRepository.save(product);

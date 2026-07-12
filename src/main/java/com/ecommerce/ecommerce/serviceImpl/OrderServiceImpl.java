@@ -26,14 +26,8 @@ import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.service.OrderService;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 
 
-import com.ecommerce.ecommerce.entity.OrderItem;
-import com.ecommerce.ecommerce.entity.OrderTracking;
-import com.ecommerce.ecommerce.entity.Product;
 
 @Service
 @Transactional
@@ -249,61 +243,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    
-    private User validateUser(Long userId){
-
-        return userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
-    }
-    
-    
-    private Address validateAddress(Long addressId){
-
-        return addressRepository.findById(addressId)
-                .orElseThrow(() ->
-                        new RuntimeException("Address not found"));
-    }
-    
-    
-    
-    private List<Cart> loadCart(User user){
-
-        List<Cart> cartItems =
-                cartRepository.findByUserId(user.getId());
-
-        if(cartItems.isEmpty()){
-
-            throw new RuntimeException("Cart is empty");
-
-        }
-
-        return cartItems;
-    }
-    
-    
-    private Map<Seller, List<Cart>> groupCartBySeller(
-            List<Cart> cartItems){
-
-        Map<Seller,List<Cart>> sellerCartMap =
-                new HashMap<>();
-
-        for(Cart cart : cartItems){
-
-            Seller seller =
-                    cart.getProduct().getSeller();
-
-            sellerCartMap
-                    .computeIfAbsent(
-                            seller,
-                            s -> new ArrayList<>())
-                    .add(cart);
-
-        }
-
-        return sellerCartMap;
-
-    }
+  
 
 
 

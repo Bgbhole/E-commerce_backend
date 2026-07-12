@@ -1,12 +1,9 @@
 package com.ecommerce.ecommerce.controller;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 
+import com.ecommerce.ecommerce.dto.ProductResponse;
 import com.ecommerce.ecommerce.entity.DeletedProduct;
 import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.entity.Seller;
@@ -148,10 +145,21 @@ public class ProductController {
 		double finalPrice = sellingPrice + gstAmount;
 		product.setFinalPrice(finalPrice);
 
-		product.setImage(image != null && !image.isEmpty() ? image.getBytes() : null);
-		product.setImage2(image2 != null && !image2.isEmpty() ? image2.getBytes() : null);
-		product.setImage3(image3 != null && !image3.isEmpty() ? image3.getBytes() : null);
-		product.setImage4(image4 != null && !image4.isEmpty() ? image4.getBytes() : null);
+		product.setImage(image != null && !image.isEmpty()
+		        ? image.getBytes()
+		        : product.getImage());
+
+		product.setImage2(image2 != null && !image2.isEmpty()
+		        ? image2.getBytes()
+		        : product.getImage2());
+
+		product.setImage3(image3 != null && !image3.isEmpty()
+		        ? image3.getBytes()
+		        : product.getImage3());
+
+		product.setImage4(image4 != null && !image4.isEmpty()
+		        ? image4.getBytes()
+		        : product.getImage4());
 
 		product.setColor(color);
 		product.setWeight(weight);
@@ -251,8 +259,30 @@ public class ProductController {
 	}
 
 	@GetMapping("/all")
-	public List<Product> getAllProducts() {
-		return productService.getAllProducts();
+	public List<ProductResponse> getAllProducts() {
+
+	    List<Product> products = productService.getAllProducts();
+
+	    return products.stream().map(product -> {
+
+	        ProductResponse dto = new ProductResponse();
+
+	        dto.setProductId(product.getProductId());
+	        dto.setProductName(product.getProductName());
+	        dto.setBrand(product.getBrand());
+	        dto.setCategory(product.getCategory());
+	        dto.setDescription(product.getDescription());
+	        dto.setFinalPrice(product.getFinalPrice());
+	        dto.setQuantity(product.getQuantity());
+
+	        dto.setImage("/api/products/image/" + product.getProductId());
+	        dto.setImage2("/api/products/image2/" + product.getProductId());
+	        dto.setImage3("/api/products/image3/" + product.getProductId());
+	        dto.setImage4("/api/products/image4/" + product.getProductId());
+
+	        return dto;
+
+	    }).toList();
 	}
 
 	@PutMapping("/update/{id}")
@@ -302,8 +332,13 @@ public class ProductController {
 	    deleted.setProductName(product.getProductName());
 	    deleted.setBrand(product.getBrand());
 	    deleted.setCategory(product.getCategory());
-
+	    
 	    deleted.setImage(product.getImage());
+	    deleted.setImage2(product.getImage2());
+	    deleted.setImage3(product.getImage3());
+	    deleted.setImage4(product.getImage4());
+
+	    
 
 	    deleted.setPurchasePrice(product.getPurchasePrice());
 	    deleted.setSellingPrice(product.getSellingPrice());
@@ -341,34 +376,49 @@ public class ProductController {
 		return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
 	}
 
-	private String saveImage(MultipartFile image) throws Exception {
-
-	    if (image == null || image.isEmpty()) {
-	        return null;
-	    }
-
-	    Path uploadDir = Paths.get("uploads");
-
-	    if (!Files.exists(uploadDir)) {
-	        Files.createDirectories(uploadDir);
-	    }
-
-	    String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-
-	    Path filePath = uploadDir.resolve(fileName);
-
-	    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-	    return fileName;
-	}
+	
 	
 
 
-	@GetMapping(value = "/image/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping("/image/{id}")
 	public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
 
-	    Product product = productRepository.findById(id).orElseThrow();
+	    Product product = productRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Product not found"));
 
-	    return ResponseEntity.ok(product.getImage());
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.IMAGE_JPEG)
+	            .body(product.getImage());
+	}
+	
+	@GetMapping("/image2/{id}")
+	public ResponseEntity<byte[]> getImage2(@PathVariable Long id) {
+
+	    Product product = productRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.IMAGE_JPEG)
+	            .body(product.getImage2());
+	}
+	@GetMapping("/image3/{id}")
+	public ResponseEntity<byte[]> getImage3(@PathVariable Long id) {
+
+	    Product product = productRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.IMAGE_JPEG)
+	            .body(product.getImage3());
+	}
+	@GetMapping("/image4/{id}")
+	public ResponseEntity<byte[]> getImage4(@PathVariable Long id) {
+
+	    Product product = productRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.IMAGE_JPEG)
+	            .body(product.getImage4());
 	}
 }
