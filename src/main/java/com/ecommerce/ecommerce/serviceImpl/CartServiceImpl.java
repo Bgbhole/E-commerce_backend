@@ -40,6 +40,10 @@ public class CartServiceImpl implements CartService {
                         request.getUserId(),
                         request.getProductId())
                 .orElse(null);
+        
+        if (product.getQuantity() <= 0) {
+            throw new RuntimeException("Product is out of stock");
+        }
 
         if (cart != null) {
 

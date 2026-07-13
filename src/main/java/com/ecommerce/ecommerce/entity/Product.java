@@ -53,19 +53,19 @@ public class Product {
     private double gstAmount;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(name = "image")
     private byte[] image;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(name = "image2")
     private byte[] image2;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(name = "image3")
     private byte[] image3;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(name = "image4")
     private byte[] image4;
   
     

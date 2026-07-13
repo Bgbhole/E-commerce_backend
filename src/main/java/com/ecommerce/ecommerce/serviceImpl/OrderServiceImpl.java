@@ -129,7 +129,20 @@ public class OrderServiceImpl implements OrderService {
 
         for (Cart cart : cartItems) {
 
-            Product product = cart.getProduct();
+        	Product product = productRepository.findById(
+        	        cart.getProduct().getProductId())
+        	        .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        	System.out.println("================================");
+        	System.out.println("Product : " + product.getProductName());
+        	System.out.println("DB Stock : " + product.getQuantity());
+        	System.out.println("Cart Qty : " + cart.getQuantity());
+        	System.out.println("================================");
+
+        	if (product.getQuantity() < cart.getQuantity()) {
+        	    throw new RuntimeException(
+        	            "Insufficient stock for " + product.getProductName());
+        	}
 
             if (product.getQuantity() < cart.getQuantity()) {
                 throw new RuntimeException(

@@ -2,6 +2,7 @@ package com.ecommerce.ecommerce.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,6 +48,11 @@ public class DeletedProduct {
     private Integer quantity;
 
     private LocalDateTime deletedAt;
+    
+    @Column(length = 1000)
+    private String description;
+
+    private Double profit;
 
     @ManyToOne
     private Seller seller;
@@ -170,6 +176,18 @@ public class DeletedProduct {
 	public void setSeller(Seller seller) {
 		this.seller = seller;
 	}
+
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public double getProfit() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
 
   
     

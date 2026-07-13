@@ -13,6 +13,8 @@ public interface ProductService {
 
 	Product saveProduct(ProductDTO dto);
 
+	void deleteProduct(Long productId);
+
 
 
 }

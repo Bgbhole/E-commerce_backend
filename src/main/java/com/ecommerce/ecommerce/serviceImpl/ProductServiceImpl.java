@@ -57,6 +57,12 @@ import com.ecommerce.ecommerce.enums.SellerStatus;
 
 	        return productRepository.save(product);
 	    }
+
+		@Override
+		public void deleteProduct(Long productId) {
+			// TODO Auto-generated method stub
+			
+		}
 	   
 	}
 
