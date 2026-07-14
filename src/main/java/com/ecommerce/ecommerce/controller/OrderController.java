@@ -3,10 +3,14 @@ package com.ecommerce.ecommerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
 import com.ecommerce.ecommerce.entity.Order;
+import com.ecommerce.ecommerce.entity.OrderItem;
+import com.ecommerce.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.ecommerce.service.OrderService;
 
 @RestController
@@ -16,6 +20,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     // ================= PLACE ORDER =================
 
@@ -80,6 +87,22 @@ public class OrderController {
             @PathVariable Long orderId) {
 
         return orderService.cancelOrder(orderId);
+    }
+    
+    @GetMapping("/item-image/{orderItemId}")
+    public ResponseEntity<byte[]> getOrderItemImage(
+            @PathVariable Long orderItemId) {
+
+        OrderItem item = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
+
+        if (item.getImage() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(item.getImage());
     }
 
 }

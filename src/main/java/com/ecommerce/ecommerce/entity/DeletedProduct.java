@@ -178,14 +178,22 @@ public class DeletedProduct {
 	}
 
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+	    return description;
 	}
 
-	public double getProfit() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setDescription(String description) {
+	    this.description = description;
 	}
+
+	public Double getProfit() {
+	    return profit;
+	}
+
+	public void setProfit(Double profit) {
+	    this.profit = profit;
+	}
+	
+	
 
 	
 

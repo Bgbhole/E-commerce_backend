@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.entity.DeletedProduct;
+import com.ecommerce.ecommerce.entity.Product;
+import com.ecommerce.ecommerce.enums.ProductStatus;
+import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.service.DeletedProductService;
 
 @RestController
@@ -15,6 +18,10 @@ public class DeletedProductController {
 
     @Autowired
     private DeletedProductService deletedProductService;
+    
+    @Autowired
+    private ProductRepository productRepository ;
+    
 
     @GetMapping
     public List<DeletedProduct> getAllDeletedProducts() {
@@ -24,11 +31,13 @@ public class DeletedProductController {
     }
 
     @GetMapping("/seller/{sellerId}")
-    public List<DeletedProduct> getSellerDeletedProducts(
+    public List<Product> getSellerProducts(
             @PathVariable Long sellerId) {
 
-        return deletedProductService.getDeletedProductsBySeller(sellerId);
-
+        return productRepository.findBySellerSellerIdAndStatusNot(
+                sellerId,
+                ProductStatus.DELETED
+        );
     }
 
     @PostMapping("/restore/{deletedProductId}")

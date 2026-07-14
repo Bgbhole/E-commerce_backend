@@ -112,11 +112,11 @@ public class Product {
     private String author;
     private String publisher;
     private String language;
-    private String pages;
+    private Integer pages;
     private String isbn;
     private String edition;
     private String binding;
-    private String publicationYear;
+    private Integer publicationYear;
     
     //Grocery
     private String manufacturer;
@@ -560,13 +560,11 @@ public class Product {
 		this.language = language;
 	}
 
-	public String getPages() {
+	public Integer getPages() {
 		return pages;
 	}
 
-	public void setPages(String pages) {
-		this.pages = pages;
-	}
+	
 
 	public String getIsbn() {
 		return isbn;
@@ -592,13 +590,10 @@ public class Product {
 		this.binding = binding;
 	}
 
-	public String getPublicationYear() {
+	public Integer getPublicationYear() {
 		return publicationYear;
 	}
 
-	public void setPublicationYear(String publicationYear) {
-		this.publicationYear = publicationYear;
-	}
 
 	public String getManufacturer() {
 		return manufacturer;
@@ -734,6 +729,18 @@ public class Product {
 
 	public void setSafety(String safety) {
 		this.safety = safety;
+	}
+
+	
+
+	public void setPages(Integer pages) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setPublicationYear(Integer publicationYear) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
