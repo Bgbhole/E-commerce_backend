@@ -734,13 +734,11 @@ public class Product {
 	
 
 	public void setPages(Integer pages) {
-		// TODO Auto-generated method stub
-		
+	    this.pages = pages;
 	}
 
 	public void setPublicationYear(Integer publicationYear) {
-		// TODO Auto-generated method stub
-		
+	    this.publicationYear = publicationYear;
 	}
 	
 	
