@@ -27,18 +27,13 @@ public class DeletedProduct {
 
     private String category;
 
-    @Lob
-    private byte[] image;
-    
-    @Lob
-    private byte[] image2;
+    private String image;
 
-    @Lob
-    private byte[] image3;
+    private String image2;
 
-    @Lob
-    private byte[] image4;
+    private String image3;
 
+    private String image4;
     private Double purchasePrice;
 
     private Double sellingPrice;
@@ -97,36 +92,38 @@ public class DeletedProduct {
 		this.category = category;
 	}
 	
-	public byte[] getImage() {
-	    return image;
+	
+
+	public String getImage() {
+		return image;
 	}
 
-	public void setImage(byte[] image) {
-	    this.image = image;
+	public void setImage(String image) {
+		this.image = image;
 	}
 
-	public byte[] getImage2() {
-	    return image2;
+	public String getImage2() {
+		return image2;
 	}
 
-	public void setImage2(byte[] image2) {
-	    this.image2 = image2;
+	public void setImage2(String image2) {
+		this.image2 = image2;
 	}
 
-	public byte[] getImage3() {
-	    return image3;
+	public String getImage3() {
+		return image3;
 	}
 
-	public void setImage3(byte[] image3) {
-	    this.image3 = image3;
+	public void setImage3(String image3) {
+		this.image3 = image3;
 	}
 
-	public byte[] getImage4() {
-	    return image4;
+	public String getImage4() {
+		return image4;
 	}
 
-	public void setImage4(byte[] image4) {
-	    this.image4 = image4;
+	public void setImage4(String image4) {
+		this.image4 = image4;
 	}
 
 	public Double getPurchasePrice() {

@@ -90,7 +90,7 @@ public class OrderController {
     }
     
     @GetMapping("/item-image/{orderItemId}")
-    public ResponseEntity<byte[]> getOrderItemImage(
+    public ResponseEntity<String> getOrderItemImage(
             @PathVariable Long orderItemId) {
 
         OrderItem item = orderItemRepository.findById(orderItemId)

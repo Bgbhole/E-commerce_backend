@@ -51,22 +51,13 @@ public class Product {
     private double gstPercentage;
 
     private double gstAmount;
+    private String image;
 
-    @Lob
-    @Column(name = "image")
-    private byte[] image;
+    private String image2;
 
-    @Lob
-    @Column(name = "image2")
-    private byte[] image2;
+    private String image3;
 
-    @Lob
-    @Column(name = "image3")
-    private byte[] image3;
-
-    @Lob
-    @Column(name = "image4")
-    private byte[] image4;
+    private String image4;
   
     
     private double finalPrice;
@@ -271,35 +262,37 @@ public class Product {
 
 
 
-	public byte[] getImage() {
+	
+
+	public String getImage() {
 		return image;
 	}
 
-	public void setImage(byte[] image) {
+	public void setImage(String image) {
 		this.image = image;
 	}
 
-	public byte[] getImage2() {
+	public String getImage2() {
 		return image2;
 	}
 
-	public void setImage2(byte[] image2) {
+	public void setImage2(String image2) {
 		this.image2 = image2;
 	}
 
-	public byte[] getImage3() {
+	public String getImage3() {
 		return image3;
 	}
 
-	public void setImage3(byte[] image3) {
+	public void setImage3(String image3) {
 		this.image3 = image3;
 	}
 
-	public byte[] getImage4() {
+	public String getImage4() {
 		return image4;
 	}
 
-	public void setImage4(byte[] image4) {
+	public void setImage4(String image4) {
 		this.image4 = image4;
 	}
 

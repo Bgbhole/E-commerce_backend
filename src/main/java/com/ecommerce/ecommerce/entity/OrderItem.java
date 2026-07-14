@@ -42,10 +42,7 @@ import jakarta.persistence.ManyToOne;
 	
 		    private String category;
 	
-		    @Lob
-		    @Column(columnDefinition = "LONGBLOB")
-		    private byte[] image;
-	
+		    private String image;	
 		    private double purchasePrice;
 	
 		    private double sellingPrice;
@@ -87,14 +84,16 @@ import jakarta.persistence.ManyToOne;
 			}
 	
 
-public byte[] getImage() {
-    return image;
-}
-
-public void setImage(byte[] image) {
-    this.image = image;
-}
+			
 	
+			public String getImage() {
+				return image;
+			}
+
+			public void setImage(String image) {
+				this.image = image;
+			}
+
 			public double getPurchasePrice() {
 				return purchasePrice;
 			}

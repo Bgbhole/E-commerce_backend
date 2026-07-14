@@ -22,11 +22,18 @@ import com.ecommerce.ecommerce.entity.OrderItem;
 import com.ecommerce.ecommerce.entity.Product;
 import com.ecommerce.ecommerce.service.ProductService;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
 
+	private final String uploadDir = "uploads";
+	
 	@Autowired
 	private ProductRepository productRepository;
 
@@ -42,6 +49,8 @@ public class ProductController {
 	@PostMapping(value = "/AddProduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Product addProduct(
 
+			
+			
 	        // Basic
 	        @RequestParam String productName,
 	        @RequestParam String description,
@@ -227,16 +236,19 @@ public class ProductController {
 	    product.setEducational(educational);
 	    product.setSafety(safety);
 
-	    product.setImage(image.getBytes());
+	    String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
 
-	    if (image2 != null && !image2.isEmpty())
-	        product.setImage2(image2.getBytes());
+	    Path uploadPath = Paths.get(uploadDir);
 
-	    if (image3 != null && !image3.isEmpty())
-	        product.setImage3(image3.getBytes());
+	    Files.createDirectories(uploadPath);
 
-	    if (image4 != null && !image4.isEmpty())
-	        product.setImage4(image4.getBytes());
+	    Files.copy(
+	            image.getInputStream(),
+	            uploadPath.resolve(fileName),
+	            StandardCopyOption.REPLACE_EXISTING
+	    );
+
+	    product.setImage(fileName);
 
 	    Seller seller = sellerRepository.findById(sellerId)
 	            .orElseThrow(() -> new RuntimeException("Seller Not Found"));
@@ -397,7 +409,7 @@ public class ProductController {
     }
     
     @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+    public ResponseEntity<String> getImage(@PathVariable Long id) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
@@ -413,7 +425,7 @@ public class ProductController {
     
     
     @GetMapping("/image2/{id}")
-    public ResponseEntity<byte[]> getImage2(@PathVariable Long id) {
+    public ResponseEntity<String> getImage2(@PathVariable Long id) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
@@ -429,7 +441,7 @@ public class ProductController {
     
     
     @GetMapping("/image3/{id}")
-    public ResponseEntity<byte[]> getImage3(@PathVariable Long id) {
+    public ResponseEntity<String> getImage3(@PathVariable Long id) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
@@ -445,7 +457,7 @@ public class ProductController {
     
     
     @GetMapping("/image4/{id}")
-    public ResponseEntity<byte[]> getImage4(@PathVariable Long id) {
+    public ResponseEntity<String> getImage4(@PathVariable Long id) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
@@ -504,7 +516,7 @@ public class ProductController {
     }
     
     @GetMapping("/item-image/{orderItemId}")
-    public ResponseEntity<byte[]> getOrderItemImage(@PathVariable Long orderItemId) {
+    public ResponseEntity<String> getOrderItemImage(@PathVariable Long orderItemId) {
 
         OrderItem item = orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new RuntimeException("Order Item Not Found"));
