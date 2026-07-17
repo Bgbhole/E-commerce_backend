@@ -12,8 +12,11 @@ import com.ecommerce.ecommerce.enums.ProductStatus;
 import com.ecommerce.ecommerce.enums.SellerStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -194,6 +197,8 @@ public class ProductController {
 	    product.setPattern(pattern);
 	    product.setSleeve(sleeve);
 	    product.setWashCare(washCare);
+	    
+	    
 
 	    // Furniture
 	    product.setDimensions(dimensions);
@@ -236,19 +241,45 @@ public class ProductController {
 	    product.setEducational(educational);
 	    product.setSafety(safety);
 
-	    String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-
+	    
 	    Path uploadPath = Paths.get(uploadDir);
-
 	    Files.createDirectories(uploadPath);
 
-	    Files.copy(
-	            image.getInputStream(),
-	            uploadPath.resolve(fileName),
-	            StandardCopyOption.REPLACE_EXISTING
-	    );
+	    // Image 1
+	    if (image != null && !image.isEmpty()) {
+	        String file1 = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+	        Files.copy(image.getInputStream(),
+	                uploadPath.resolve(file1),
+	                StandardCopyOption.REPLACE_EXISTING);
+	        product.setImage(file1);
+	    }
 
-	    product.setImage(fileName);
+	    // Image 2
+	    if (image2 != null && !image2.isEmpty()) {
+	        String file2 = System.currentTimeMillis() + "_2_" + image2.getOriginalFilename();
+	        Files.copy(image2.getInputStream(),
+	                uploadPath.resolve(file2),
+	                StandardCopyOption.REPLACE_EXISTING);
+	        product.setImage2(file2);
+	    }
+
+	    // Image 3
+	    if (image3 != null && !image3.isEmpty()) {
+	        String file3 = System.currentTimeMillis() + "_3_" + image3.getOriginalFilename();
+	        Files.copy(image3.getInputStream(),
+	                uploadPath.resolve(file3),
+	                StandardCopyOption.REPLACE_EXISTING);
+	        product.setImage3(file3);
+	    }
+
+	    // Image 4
+	    if (image4 != null && !image4.isEmpty()) {
+	        String file4 = System.currentTimeMillis() + "_4_" + image4.getOriginalFilename();
+	        Files.copy(image4.getInputStream(),
+	                uploadPath.resolve(file4),
+	                StandardCopyOption.REPLACE_EXISTING);
+	        product.setImage4(file4);
+	    }
 
 	    Seller seller = sellerRepository.findById(sellerId)
 	            .orElseThrow(() -> new RuntimeException("Seller Not Found"));
@@ -256,6 +287,8 @@ public class ProductController {
 	    product.setSeller(seller);
 	    product.setStatus(ProductStatus.PENDING);
 
+	    
+	    
 	    return productRepository.save(product);
 	}
     
@@ -409,68 +442,102 @@ public class ProductController {
     }
     
     @GetMapping("/image/{id}")
-    public ResponseEntity<String> getImage(@PathVariable Long id) {
+    public ResponseEntity<Resource> getImage(@PathVariable Long id) throws IOException {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-        if (product.getImage() == null) {
+        if (product.getImage() == null || product.getImage().isBlank()) {
             return ResponseEntity.notFound().build();
         }
 
+        Path path = Paths.get("uploads", product.getImage());
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new UrlResource(path.toUri());
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(product.getImage());
+                .contentType(MediaTypeFactory.getMediaType(resource)
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .body(resource);
     }
-    
     
     @GetMapping("/image2/{id}")
-    public ResponseEntity<String> getImage2(@PathVariable Long id) {
+    public ResponseEntity<Resource> getImage2(@PathVariable Long id) throws IOException {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-        if (product.getImage2() == null) {
+        if (product.getImage2() == null || product.getImage2().isBlank()) {
             return ResponseEntity.notFound().build();
         }
 
+        Path path = Paths.get("uploads", product.getImage2());
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new UrlResource(path.toUri());
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(product.getImage2());
+                .contentType(MediaTypeFactory.getMediaType(resource)
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .body(resource);
     }
-    
     
     @GetMapping("/image3/{id}")
-    public ResponseEntity<String> getImage3(@PathVariable Long id) {
+    public ResponseEntity<Resource> getImage3(@PathVariable Long id) throws IOException {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-        if (product.getImage3() == null) {
+        if (product.getImage3() == null || product.getImage3().isBlank()) {
             return ResponseEntity.notFound().build();
         }
 
+        Path path = Paths.get("uploads", product.getImage3());
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new UrlResource(path.toUri());
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(product.getImage3());
+                .contentType(MediaTypeFactory.getMediaType(resource)
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .body(resource);
     }
-    
     
     @GetMapping("/image4/{id}")
-    public ResponseEntity<String> getImage4(@PathVariable Long id) {
+    public ResponseEntity<Resource> getImage4(@PathVariable Long id) throws IOException {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-        if (product.getImage4() == null) {
+        if (product.getImage4() == null || product.getImage4().isBlank()) {
             return ResponseEntity.notFound().build();
         }
 
+        Path path = Paths.get("uploads", product.getImage4());
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new UrlResource(path.toUri());
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(product.getImage4());
+                .contentType(MediaTypeFactory.getMediaType(resource)
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .body(resource);
     }
     
+   
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<String> deleteProduct(
             @PathVariable Long productId) {
@@ -529,5 +596,6 @@ public class ProductController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(item.getImage());
     }
+    
     
 }

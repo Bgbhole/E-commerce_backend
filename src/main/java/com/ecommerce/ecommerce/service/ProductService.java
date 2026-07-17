@@ -35,6 +35,10 @@ public interface ProductService {
 	Product saveProduct(ProductDTO dto);
 
 	void deleteProduct(Long productId);
+	
+	List<Product> getRelatedProducts(
+	        Long productId
+	);
 
 
 

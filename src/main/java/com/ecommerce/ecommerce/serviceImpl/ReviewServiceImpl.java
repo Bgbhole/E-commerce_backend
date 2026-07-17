@@ -45,7 +45,26 @@ public class ReviewServiceImpl implements ReviewService {
         review.setReview(dto.getReview());
         review.setReviewDate(LocalDateTime.now());
 
-        return reviewRepository.save(review);
+   
+
+        Review savedReview = reviewRepository.save(review);
+        
+        List<Review> reviews =
+                reviewRepository.findByProductProductId(product.getProductId());
+
+        double average = reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0);
+
+        Product updatedProduct = productRepository.findById(product.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+        updatedProduct.setAverageRating(average);
+        updatedProduct.setTotalReviews(reviews.size());
+
+        productRepository.save(updatedProduct);
+        return savedReview;
 
     }
 
@@ -66,5 +85,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.deleteById(reviewId);
 
     }
+    
+    
 
 }

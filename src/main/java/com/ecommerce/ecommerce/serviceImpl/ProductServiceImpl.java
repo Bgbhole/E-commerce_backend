@@ -108,6 +108,19 @@ import com.ecommerce.ecommerce.enums.SellerStatus;
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public List<Product> getRelatedProducts(Long productId) {
+
+		    Product product = productRepository.findById(productId)
+		            .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+		    return productRepository.findByCategoryAndProductIdNot(
+		            product.getCategory(),
+		            productId
+		    );
+
+		}
 	    
 	   
 	}

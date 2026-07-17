@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.ecommerce.dto.UpdateDeliveryRequest;
 import com.ecommerce.ecommerce.entity.Order;
 import com.ecommerce.ecommerce.entity.OrderItem;
 import com.ecommerce.ecommerce.repository.OrderItemRepository;
@@ -103,6 +104,17 @@ public class OrderController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(item.getImage());
+    }
+    
+    @PutMapping("/update-address/{orderId}")
+    public Order updateDeliveryAddress(
+
+            @PathVariable Long orderId,
+
+            @RequestBody UpdateDeliveryRequest request){
+
+        return orderService.updateDeliveryAddress(orderId, request);
+
     }
 
 }

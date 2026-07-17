@@ -31,6 +31,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findBySellerSellerIdAndStatusNot(
 	        Long sellerId,
 	        ProductStatus status);
+	
+	List<Product> findByCategoryAndProductIdNot(
+	        String category,
+	        Long productId
+	);
 
 
 }

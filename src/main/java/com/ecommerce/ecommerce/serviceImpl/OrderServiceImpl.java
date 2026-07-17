@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.ecommerce.dto.UpdateDeliveryRequest;
 import com.ecommerce.ecommerce.entity.Address;
 import com.ecommerce.ecommerce.entity.Cart;
 import com.ecommerce.ecommerce.entity.Order;
@@ -305,6 +306,35 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return order;
+    }
+    
+    @Override
+    public Order updateDeliveryAddress(
+
+            Long orderId,
+
+            UpdateDeliveryRequest request){
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow();
+
+        if(order.getStatus() != TrackingStatus.ORDER_CONFIRMED){
+
+            throw new RuntimeException(
+                "Address can only be changed before packing."
+            );
+
+        }
+
+        order.setDeliveryName(request.getDeliveryName());
+        order.setDeliveryMobile(request.getDeliveryMobile());
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setDeliveryCity(request.getDeliveryCity());
+        order.setDeliveryState(request.getDeliveryState());
+        order.setDeliveryPincode(request.getDeliveryPincode());
+
+        return orderRepository.save(order);
+
     }
     
     

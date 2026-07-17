@@ -134,6 +134,15 @@ public class Product {
     private String educational;
     private String safety;
     
+    
+    @Column(name = "average_rating")
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews")
+    private Integer totalReviews = 0;
+    
+    
+    
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
     
@@ -732,6 +741,22 @@ public class Product {
 
 	public void setPublicationYear(Integer publicationYear) {
 	    this.publicationYear = publicationYear;
+	}
+
+	public Double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(Double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public Integer getTotalReviews() {
+		return totalReviews;
+	}
+
+	public void setTotalReviews(Integer totalReviews) {
+		this.totalReviews = totalReviews;
 	}
 	
 	
