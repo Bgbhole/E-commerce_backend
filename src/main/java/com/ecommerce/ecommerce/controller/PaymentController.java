@@ -81,5 +81,27 @@ public class PaymentController {
 	    return "UPI Deleted Successfully";
 
 	}
+	
+	@PutMapping("/upi/{upiId}")
+	public Upi updateUpi(@PathVariable Long upiId,
+	                     @RequestBody Upi upi) {
 
+	    Upi existing = upiRepository.findById(upiId).orElseThrow();
+
+	    existing.setUpiNumber(upi.getUpiNumber());
+
+	    return upiRepository.save(existing);
+	}
+
+	
+	@PutMapping("/upi/{upiId}")
+	public Upi updateUpi(@PathVariable Long upiId,
+	                     @RequestBody Upi upi) {
+
+	    Upi existing = upiRepository.findById(upiId).orElseThrow();
+
+	    existing.setUpiNumber(upi.getUpiNumber());
+
+	    return upiRepository.save(existing);
+	}
 }
