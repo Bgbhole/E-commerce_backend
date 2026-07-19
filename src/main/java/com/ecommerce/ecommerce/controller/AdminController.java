@@ -15,6 +15,7 @@ import com.ecommerce.ecommerce.entity.Seller;
 import com.ecommerce.ecommerce.enums.ProductStatus;
 import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.service.AdminService;
+import com.ecommerce.ecommerce.service.ProductService;
 
 
 
@@ -28,6 +29,9 @@ public class AdminController {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private ProductService productService;
     
     
     @PostMapping("/login")
@@ -113,6 +117,17 @@ public class AdminController {
     public List<Product> getPendingProducts() {
 
         return adminService.getPendingProducts();
+
+    }
+    
+    @PutMapping("/{id}/pending")
+    public Product sendToPending(@PathVariable Long id){
+
+        Product product = productService.getProduct(id);
+
+        product.setStatus(ProductStatus.PENDING);
+
+        return productService.save(product);
 
     }
 

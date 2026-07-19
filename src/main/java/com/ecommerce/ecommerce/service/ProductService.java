@@ -40,6 +40,12 @@ public interface ProductService {
 	        Long productId
 	);
 
+	Product getProduct(Long id);
+
+	Product save(Product product);
+
+	Product updateProduct(Long id, Product product);
+
 
 
 }

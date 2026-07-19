@@ -64,8 +64,16 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<Cart> getUserCart(Long userId) {
 
-        return cartRepository.findByUserId(userId);
+        List<Cart> carts = cartRepository.findByUserId(userId);
 
+        carts.forEach(c -> {
+            System.out.println("Product : " + c.getProduct().getProductName());
+            System.out.println("Final Price : " + c.getProduct().getFinalPrice());
+            System.out.println("Final Selling Price : " + c.getProduct().getFinalSellingPrice());
+            System.out.println("Quantity : " + c.getQuantity());
+        });
+
+        return carts;
     }
 
     @Override

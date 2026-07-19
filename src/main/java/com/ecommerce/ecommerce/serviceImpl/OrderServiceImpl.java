@@ -121,7 +121,15 @@ public class OrderServiceImpl implements OrderService {
         double total = 0;
 
         for (Cart cart : cartItems) {
-            total += cart.getProduct().getFinalPrice() * cart.getQuantity();
+
+            Product product = cart.getProduct();
+
+            double price =
+                    product.getFinalSellingPrice() != null
+                    ? product.getFinalSellingPrice()
+                    : product.getFinalPrice();
+
+            total += price * cart.getQuantity();
         }
 
         order.setTotalAmount(total);
@@ -162,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
 
             item.setPurchasePrice(product.getPurchasePrice());
             item.setSellingPrice(product.getSellingPrice());
-            item.setFinalPrice(product.getFinalPrice());
+           
 
             item.setGstPercentage(product.getGstPercentage());
             item.setGstAmount(product.getGstAmount());
@@ -170,7 +178,16 @@ public class OrderServiceImpl implements OrderService {
             item.setProfit(product.getProfit());
 
             item.setQuantity(cart.getQuantity());
-            item.setPrice(product.getFinalPrice());
+            
+            double price =
+                    product.getFinalSellingPrice() != null
+                    ? product.getFinalSellingPrice()
+                    : product.getFinalPrice();
+
+            item.setFinalPrice(price);
+
+            item.setPrice(price);
+          
 
             orderItemRepository.save(item);
 

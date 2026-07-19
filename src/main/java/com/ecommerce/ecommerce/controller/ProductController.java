@@ -606,5 +606,41 @@ public class ProductController {
                 .body(item.getImage());
     }
     
+    @PutMapping("/{id}/pending")
+    public Product sendToPending(@PathVariable Long id){
+
+        Product product = productService.getProduct(id);
+
+        product.setStatus(ProductStatus.PENDING);
+
+        return productService.save(product);
+
+    }
+    @PutMapping("/{id}/discount")
+    public ResponseEntity<Product> updateDiscount(
+            @PathVariable Long id,
+            @RequestBody Product request) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+        double basePrice = product.getFinalPrice(); // includes GST
+
+        double discount = request.getAdminDiscount();
+
+        double discountAmount = basePrice * discount / 100.0;
+
+        double finalSellingPrice = basePrice - discountAmount;
+
+        product.setAdminDiscount(discount);
+        product.setDiscountAmount(discountAmount);
+        product.setFinalSellingPrice(finalSellingPrice);
+
+        productRepository.save(product);
+
+        return ResponseEntity.ok(product);
+    }
     
+  
 }
+    

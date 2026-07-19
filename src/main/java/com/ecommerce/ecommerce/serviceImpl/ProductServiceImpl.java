@@ -121,6 +121,73 @@ import com.ecommerce.ecommerce.enums.SellerStatus;
 		    );
 
 		}
+
+		@Override
+		public Product getProduct(Long id) {
+
+		    return productRepository.findById(id)
+		            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+		}
+
+		@Override
+		public Product save(Product product) {
+
+		    return productRepository.save(product);
+
+		}
+		
+		@Override
+		public Product updateProduct(Long id, Product product) {
+
+		    Product existing = productRepository.findById(id)
+		            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+		    existing.setProductName(product.getProductName());
+		    existing.setDescription(product.getDescription());
+		    existing.setBrand(product.getBrand());
+		    existing.setCategory(product.getCategory());
+
+		    existing.setPurchasePrice(product.getPurchasePrice());
+		    existing.setSellingPrice(product.getSellingPrice());
+
+		    existing.setQuantity(product.getQuantity());
+
+		    existing.setColor(product.getColor());
+		    existing.setWeight(product.getWeight());
+		    existing.setWarranty(product.getWarranty());
+		    existing.setModel(product.getModel());
+
+		    existing.setSize(product.getSize());
+		    existing.setMaterial(product.getMaterial());
+		    existing.setFabric(product.getFabric());
+		    existing.setGender(product.getGender());
+		    existing.setFit(product.getFit());
+		    existing.setPattern(product.getPattern());
+		    existing.setSleeve(product.getSleeve());
+		    existing.setWashCare(product.getWashCare());
+
+		    existing.setRam(product.getRam());
+		    existing.setStorage(product.getStorage());
+		    existing.setProcessor(product.getProcessor());
+		    existing.setBattery(product.getBattery());
+		    existing.setCamera(product.getCamera());
+		    existing.setDisplay(product.getDisplay());
+		    existing.setOperatingSystem(product.getOperatingSystem());
+		    existing.setNetwork(product.getNetwork());
+
+		    existing.setVoltage(product.getVoltage());
+		    existing.setPower(product.getPower());
+		    existing.setConnectivity(product.getConnectivity());
+
+		    existing.setDimensions(product.getDimensions());
+		    existing.setFinish(product.getFinish());
+		    existing.setAssembly(product.getAssembly());
+		    existing.setRoomType(product.getRoomType());
+
+		    return productRepository.save(existing);
+
+		}
 	    
 	   
 	}
