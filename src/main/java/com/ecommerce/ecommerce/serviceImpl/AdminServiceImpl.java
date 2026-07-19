@@ -18,6 +18,7 @@ import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.SellerRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.service.AdminService;
+import com.ecommerce.ecommerce.dto.ProductVerificationRequest;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -112,38 +113,7 @@ public class AdminServiceImpl implements AdminService {
         return productRepository.findByStatus(ProductStatus.PENDING);
 
     }
-    
-    @Override
-    public String approveProduct(Long productId) {
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
-
-        product.setStatus(ProductStatus.ACTIVE);
-
-        productRepository.save(product);
-
-        return "Product Approved Successfully";
-
-    }
-    
-    
-    @Override
-    public String rejectProduct(Long productId) {
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() ->
-                        new RuntimeException("Product not found"));
-
-        product.setStatus(ProductStatus.INACTIVE);
-
-        productRepository.save(product);
-
-        return "Product Rejected Successfully";
-
-    }
-    
+     
     
     
     @Override
@@ -162,4 +132,71 @@ public class AdminServiceImpl implements AdminService {
         return admin;
     }
     
+    @Override
+    public String approveProduct(Long productId,
+            ProductVerificationRequest request) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found"));
+
+        // Seller Price
+        Double sellerPrice = product.getSellerPrice();
+
+        if (sellerPrice == null) {
+            sellerPrice = product.getSellingPrice();
+
+            product.setSellerPrice(sellerPrice);
+        }
+
+        // Discount %
+        double adminDiscount = request.getAdminDiscount() == null
+                ? 0
+                : request.getAdminDiscount();
+
+        // Limit discount between 0 and 100
+        adminDiscount = Math.max(0, Math.min(adminDiscount, 100));
+
+        // Calculate values on server
+        double discountAmount =
+                sellerPrice * adminDiscount / 100;
+
+        double finalSellingPrice =
+                sellerPrice - discountAmount;
+
+        product.setAdminDiscount(adminDiscount);
+        product.setDiscountAmount(discountAmount);
+        product.setFinalSellingPrice(finalSellingPrice);
+
+        // Keep existing profit unless your business logic changes it
+        product.setSellerProfit(product.getSellerProfit());
+
+        // Platform contribution equals discount amount
+        product.setAdminContribution(discountAmount);
+
+        product.setAdminRemark(request.getAdminRemark());
+
+        product.setStatus(ProductStatus.ACTIVE);
+
+        productRepository.save(product);
+
+        return "Product Approved Successfully";
+    }
+    
+    @Override
+    public String rejectProduct(Long productId,
+            ProductVerificationRequest request) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found"));
+
+        product.setAdminRemark(request.getAdminRemark());
+
+        product.setStatus(ProductStatus.REJECTED);
+
+        productRepository.save(product);
+
+        return "Product Rejected Successfully";
+    }
 }

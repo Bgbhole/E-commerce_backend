@@ -284,6 +284,15 @@ public class ProductController {
 	    Seller seller = sellerRepository.findById(sellerId)
 	            .orElseThrow(() -> new RuntimeException("Seller Not Found"));
 
+	 // Initialize admin verification fields
+	    product.setSellerPrice(sellingPrice);
+	    product.setSellerProfit(profit);
+	    product.setFinalSellingPrice(finalPrice);
+
+	    product.setAdminDiscount(0.0);
+	    product.setDiscountAmount(0.0);
+	    product.setAdminContribution(0.0);
+	    product.setAdminRemark("");
 	    product.setSeller(seller);
 	    product.setStatus(ProductStatus.PENDING);
 

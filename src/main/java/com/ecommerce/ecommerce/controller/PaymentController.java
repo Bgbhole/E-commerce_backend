@@ -82,7 +82,7 @@ public class PaymentController {
 
 	}
 	
-	@PutMapping("/upi/{upiId}")
+	@PutMapping("/upi/update/{upiId}")
 	public Upi updateUpi(@PathVariable Long upiId,
 	                     @RequestBody Upi upi) {
 
@@ -94,14 +94,5 @@ public class PaymentController {
 	}
 
 	
-	@PutMapping("/upi/{upiId}")
-	public Upi updateUpi(@PathVariable Long upiId,
-	                     @RequestBody Upi upi) {
-
-	    Upi existing = upiRepository.findById(upiId).orElseThrow();
-
-	    existing.setUpiNumber(upi.getUpiNumber());
-
-	    return upiRepository.save(existing);
-	}
+	
 }

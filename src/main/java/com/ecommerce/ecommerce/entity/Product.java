@@ -47,6 +47,20 @@ public class Product {
     private double profit;
 
     private int quantity;
+    
+    private Double sellerPrice;
+
+    private Double adminDiscount;
+
+    private Double discountAmount;
+
+    private Double finalSellingPrice;
+
+    private Double sellerProfit;
+
+    private Double adminContribution;
+    
+    private String adminRemark;
 
     private double gstPercentage;
 
@@ -237,20 +251,8 @@ public class Product {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity){
-
+	public void setQuantity(int quantity) {
 	    this.quantity = quantity;
-
-	    if(quantity <= 0){
-
-	        this.status = ProductStatus.OUT_OF_STOCK;
-
-	    }else{
-
-	        this.status = ProductStatus.ACTIVE;
-
-	    }
-
 	}
 
 	public double getGstPercentage() {
@@ -758,6 +760,63 @@ public class Product {
 	public void setTotalReviews(Integer totalReviews) {
 		this.totalReviews = totalReviews;
 	}
+
+	public Double getSellerPrice() {
+	    return sellerPrice;
+	}
+
+	public void setSellerPrice(Double sellerPrice) {
+	    this.sellerPrice = sellerPrice;
+	}
+
+	public Double getSellerProfit() {
+	    return sellerProfit;
+	}
+
+	public void setSellerProfit(Double sellerProfit) {
+	    this.sellerProfit = sellerProfit;
+	}
+
+	public Double getAdminDiscount() {
+	    return adminDiscount;
+	}
+
+	public void setAdminDiscount(Double adminDiscount) {
+	    this.adminDiscount = adminDiscount;
+	}
+
+	public Double getDiscountAmount() {
+	    return discountAmount;
+	}
+
+	public void setDiscountAmount(Double discountAmount) {
+	    this.discountAmount = discountAmount;
+	}
+
+	public Double getFinalSellingPrice() {
+	    return finalSellingPrice;
+	}
+
+	public void setFinalSellingPrice(Double finalSellingPrice) {
+	    this.finalSellingPrice = finalSellingPrice;
+	}
+
+	public Double getAdminContribution() {
+	    return adminContribution;
+	}
+
+	public void setAdminContribution(Double adminContribution) {
+	    this.adminContribution = adminContribution;
+	}
+
+	public String getAdminRemark() {
+	    return adminRemark;
+	}
+
+	public void setAdminRemark(String adminRemark) {
+	    this.adminRemark = adminRemark;
+	}
+
 	
 	
     
