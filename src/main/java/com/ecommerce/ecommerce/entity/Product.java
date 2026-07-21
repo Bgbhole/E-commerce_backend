@@ -148,6 +148,12 @@ public class Product {
     private String educational;
     private String safety;
     
+    private Double platformFeePercentage;
+
+    private Double platformFeeAmount;
+
+    private Double sellerNetProfit;
+    
     
     @Column(name = "average_rating")
     private Double averageRating = 0.0;
@@ -817,7 +823,29 @@ public class Product {
 	    this.adminRemark = adminRemark;
 	}
 
-	
+	public Double getPlatformFeePercentage() {
+	    return platformFeePercentage;
+	}
+
+	public void setPlatformFeePercentage(Double platformFeePercentage) {
+	    this.platformFeePercentage = platformFeePercentage;
+	}
+
+	public Double getPlatformFeeAmount() {
+	    return platformFeeAmount;
+	}
+
+	public void setPlatformFeeAmount(Double platformFeeAmount) {
+	    this.platformFeeAmount = platformFeeAmount;
+	}
+
+	public Double getSellerNetProfit() {
+	    return sellerNetProfit;
+	}
+
+	public void setSellerNetProfit(Double sellerNetProfit) {
+	    this.sellerNetProfit = sellerNetProfit;
+	}
 	
     
     

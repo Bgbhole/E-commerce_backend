@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.ecommerce.dto.SellerPaymentRequest;
 import com.ecommerce.ecommerce.dto.UpdateDeliveryRequest;
 import com.ecommerce.ecommerce.entity.Address;
 import com.ecommerce.ecommerce.entity.Cart;
@@ -27,337 +28,427 @@ import com.ecommerce.ecommerce.repository.ProductRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.service.OrderService;
 
-
-
-
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
+	@Autowired
+	private OrderRepository orderRepository;
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
-    @Autowired
-    private CartRepository cartRepository;
+	@Autowired
+	private CartRepository cartRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+	@Autowired
+	private ProductRepository productRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private AddressRepository addressRepository;
+	@Autowired
+	private AddressRepository addressRepository;
 
-    @Autowired
-    private OrderTrackingRepository orderTrackingRepository;
-    @Override
-    @Transactional
-    public Order placeOrder(PlaceOrderRequest request) {
+	@Autowired
+	private OrderTrackingRepository orderTrackingRepository;
 
-        System.out.println("========== PLACE ORDER ==========");
-        System.out.println("UserId = " + request.getUserId());
-        System.out.println("DeliveryAddressId = " + request.getDeliveryAddressId());
-        System.out.println("BillingAddressId = " + request.getBillingAddressId());
-        System.out.println("PaymentMethod = " + request.getPaymentMethod());
+	@Override
+	@Transactional
+	public Order placeOrder(PlaceOrderRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		System.out.println("========== PLACE ORDER ==========");
+		System.out.println("UserId = " + request.getUserId());
+		System.out.println("DeliveryAddressId = " + request.getDeliveryAddressId());
+		System.out.println("BillingAddressId = " + request.getBillingAddressId());
+		System.out.println("PaymentMethod = " + request.getPaymentMethod());
 
-        Address deliveryAddress = addressRepository.findById(request.getDeliveryAddressId())
-                .orElseThrow(() -> new RuntimeException("Delivery Address not found"));
+		User user = userRepository.findById(request.getUserId())
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
-        Address billingAddress = addressRepository.findById(request.getBillingAddressId())
-                .orElse(deliveryAddress);
+		Address deliveryAddress = addressRepository.findById(request.getDeliveryAddressId())
+				.orElseThrow(() -> new RuntimeException("Delivery Address not found"));
 
-        List<Cart> cartItems = cartRepository.findByUserId(user.getId());
+		Address billingAddress = addressRepository.findById(request.getBillingAddressId()).orElse(deliveryAddress);
 
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
-        }
+		List<Cart> cartItems = cartRepository.findByUserId(user.getId());
 
-        Seller seller = cartItems.get(0).getProduct().getSeller();
+		if (cartItems.isEmpty()) {
+			throw new RuntimeException("Cart is empty");
+		}
 
-        if (seller == null) {
-            throw new RuntimeException("Seller not found");
-        }
+		Seller seller = cartItems.get(0).getProduct().getSeller();
 
-        Order order = new Order();
+		if (seller == null) {
+			throw new RuntimeException("Seller not found");
+		}
 
-        order.setUser(user);
+		Order order = new Order();
 
-        order.setSeller(seller);
+		order.setUser(user);
 
-        order.setSellerName(seller.getName());
-        order.setSellerEmail(seller.getEmail());
-        order.setSellerMobile(seller.getMobile());
-        order.setShopName(seller.getShopName());
+		order.setSeller(seller);
 
-        order.setOrderDate(LocalDateTime.now());
+		order.setSellerName(seller.getName());
+		order.setSellerEmail(seller.getEmail());
+		order.setSellerMobile(seller.getMobile());
+		order.setShopName(seller.getShopName());
 
-        order.setStatus(TrackingStatus.ORDER_CONFIRMED);
+		order.setOrderDate(LocalDateTime.now());
 
-        order.setPaymentMethod(request.getPaymentMethod());
+		order.setStatus(TrackingStatus.ORDER_CONFIRMED);
 
-        if ("COD".equalsIgnoreCase(request.getPaymentMethod())) {
-            order.setPaymentStatus("PENDING");
-        } else {
-            order.setPaymentStatus("SUCCESS");
-        }
+		order.setPaymentMethod(request.getPaymentMethod());
 
-        order.setTrackingNumber(System.currentTimeMillis());
+		String payment = request.getPaymentMethod();
 
-        // Delivery Address
-        order.setDeliveryName(deliveryAddress.getFullName());
-        order.setDeliveryMobile(deliveryAddress.getMobile());
-        order.setDeliveryAddress(deliveryAddress.getFullAddress());
-        order.setDeliveryCity(deliveryAddress.getCity());
-        order.setDeliveryState(deliveryAddress.getState());
-        order.setDeliveryPincode(deliveryAddress.getPincode());
+		if (payment != null && (payment.equalsIgnoreCase("COD") || payment.equalsIgnoreCase("Cash On Delivery"))) {
 
-        double total = 0;
+			order.setPaymentStatus("PENDING");
 
-        for (Cart cart : cartItems) {
+		} else {
 
-            Product product = cart.getProduct();
+			order.setPaymentStatus("SUCCESS");
+		}
 
-            double price =
-                    product.getFinalSellingPrice() != null
-                    ? product.getFinalSellingPrice()
-                    : product.getFinalPrice();
+		order.setTrackingNumber(System.currentTimeMillis());
 
-            total += price * cart.getQuantity();
-        }
+		// Delivery Address
+		order.setDeliveryName(deliveryAddress.getFullName());
+		order.setDeliveryMobile(deliveryAddress.getMobile());
+		order.setDeliveryAddress(deliveryAddress.getFullAddress());
+		order.setDeliveryCity(deliveryAddress.getCity());
+		order.setDeliveryState(deliveryAddress.getState());
+		order.setDeliveryPincode(deliveryAddress.getPincode());
 
-        order.setTotalAmount(total);
+		double total = 0;
 
-        order = orderRepository.save(order);
+		double sellerPrice = 0;
+		double customerPaid = 0;
+		double shopkartContribution = 0;
 
-        for (Cart cart : cartItems) {
+		double totalPlatformFee = 0;
+		double totalSellerNetProfit = 0;
 
-        	Product product = productRepository.findById(
-        	        cart.getProduct().getProductId())
-        	        .orElseThrow(() -> new RuntimeException("Product not found"));
+		Double platformFeePercentage = 0.0;
 
-        	System.out.println("================================");
-        	System.out.println("Product : " + product.getProductName());
-        	System.out.println("DB Stock : " + product.getQuantity());
-        	System.out.println("Cart Qty : " + cart.getQuantity());
-        	System.out.println("================================");
+		for (Cart cart : cartItems) {
 
-        	if (product.getQuantity() < cart.getQuantity()) {
-        	    throw new RuntimeException(
-        	            "Insufficient stock for " + product.getProductName());
-        	}
+			Product product = cart.getProduct();
 
-            if (product.getQuantity() < cart.getQuantity()) {
-                throw new RuntimeException(
-                        "Insufficient stock for " + product.getProductName());
-            }
+			double price = product.getFinalSellingPrice() != null ? product.getFinalSellingPrice()
+					: product.getFinalPrice();
 
-            OrderItem item = new OrderItem();
+			total += price * cart.getQuantity();
+			
+			platformFeePercentage = product.getPlatformFeePercentage();
 
-            item.setOrder(order);
-            item.setProduct(product);
+			totalPlatformFee +=
+			        product.getPlatformFeeAmount() * cart.getQuantity();
 
-            item.setProductName(product.getProductName());
-            item.setBrand(product.getBrand());
-            item.setCategory(product.getCategory());
-            item.setImage(product.getImage());
+			totalSellerNetProfit +=
+			        product.getSellerNetProfit() * cart.getQuantity();
+		}
 
-            item.setPurchasePrice(product.getPurchasePrice());
-            item.setSellingPrice(product.getSellingPrice());
-           
+		
+		order.setSellerPrice(sellerPrice);
 
-            item.setGstPercentage(product.getGstPercentage());
-            item.setGstAmount(product.getGstAmount());
+		order.setCustomerPaidAmount(customerPaid);
 
-            item.setProfit(product.getProfit());
+		order.setShopkartContribution(shopkartContribution);
 
-            item.setQuantity(cart.getQuantity());
-            
-            double price =
-                    product.getFinalSellingPrice() != null
-                    ? product.getFinalSellingPrice()
-                    : product.getFinalPrice();
+		
 
-            item.setFinalPrice(price);
+		order.setSellerPaymentStatus("PENDING");
+		order.setTotalAmount(total);
 
-            item.setPrice(price);
-          
+		order = orderRepository.save(order);
 
-            orderItemRepository.save(item);
+		for (Cart cart : cartItems) {
 
-            product.setQuantity(product.getQuantity() - cart.getQuantity());
+			Product product = productRepository.findById(cart.getProduct().getProductId())
+					.orElseThrow(() -> new RuntimeException("Product not found"));
 
-            productRepository.save(product);
+			System.out.println("================================");
+			System.out.println("Product : " + product.getProductName());
+			System.out.println("DB Stock : " + product.getQuantity());
+			System.out.println("Cart Qty : " + cart.getQuantity());
+			System.out.println("================================");
 
-            order.getOrderItems().add(item);
-        }
+			if (product.getQuantity() < cart.getQuantity()) {
+				throw new RuntimeException("Insufficient stock for " + product.getProductName());
+			}
 
-        OrderTracking tracking = new OrderTracking();
+			if (product.getQuantity() < cart.getQuantity()) {
+				throw new RuntimeException("Insufficient stock for " + product.getProductName());
+			}
 
-        tracking.setOrder(order);
-        tracking.setStatus(TrackingStatus.ORDER_CONFIRMED);
-        tracking.setLocation("Seller Warehouse");
-        tracking.setDescription("Your order has been confirmed.");
+			OrderItem item = new OrderItem();
 
-        orderTrackingRepository.save(tracking);
+			item.setOrder(order);
+			item.setProduct(product);
 
-        order.getTrackingHistory().add(tracking);
+			item.setProductName(product.getProductName());
+			item.setBrand(product.getBrand());
+			item.setCategory(product.getCategory());
+			item.setImage(product.getImage());
 
-        cartRepository.deleteByUserId(user.getId());
+			item.setPurchasePrice(product.getPurchasePrice());
+			item.setSellingPrice(product.getSellingPrice());
 
-        return order;
-    }
- 
-    
-    
-    @Override
-    public List<Order> getOrdersByUser(Long userId) {
+			item.setGstPercentage(product.getGstPercentage());
+			item.setGstAmount(product.getGstAmount());
 
-        return orderRepository.findByUserId(userId);
-    }
+			item.setProfit(product.getProfit());
 
-    @Override
-    public List<Order> getOrdersBySeller(Long sellerId) {
+			item.setQuantity(cart.getQuantity());
 
-        return orderRepository.findBySellerSellerId(sellerId);
-    }
+			double finalprice = product.getFinalSellingPrice() != null ? product.getFinalSellingPrice()
+					: product.getFinalPrice();
 
-    @Override
-    public Order getOrderById(Long orderId) {
+			double originalSellerPrice = product.getSellerPrice() * cart.getQuantity();
 
-        return orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new RuntimeException("Order not found"));
-    }
+			double customerAmount = finalprice * cart.getQuantity();
 
-    @Override
-    public Order cancelOrder(Long orderId) {
+			double contribution = originalSellerPrice - customerAmount;
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new RuntimeException("Order not found"));
+			sellerPrice += originalSellerPrice;
+			customerPaid += customerAmount;
+			shopkartContribution += contribution;
 
-        // Update current order status
-        order.setStatus(TrackingStatus.CANCELLED);
+			item.setFinalPrice(finalprice);
 
-        // Create tracking history
-        OrderTracking tracking = new OrderTracking();
+			item.setPrice(finalprice);
 
-        tracking.setOrder(order);
-        tracking.setStatus(TrackingStatus.CANCELLED);
-        tracking.setLocation("System");
-        tracking.setDescription("Order has been cancelled.");
+			orderItemRepository.save(item);
 
-        orderTrackingRepository.save(tracking);
+			product.setQuantity(product.getQuantity() - cart.getQuantity());
 
-        order.getTrackingHistory().add(tracking);
+			productRepository.save(product);
 
-        // Restore stock
-        List<OrderItem> items = orderItemRepository.findByOrder(order);
+			order.getOrderItems().add(item);
+		}
 
-        for (OrderItem item : items) {
+		OrderTracking tracking = new OrderTracking();
 
-            Product product = item.getProduct();
+		tracking.setOrder(order);
+		tracking.setStatus(TrackingStatus.ORDER_CONFIRMED);
+		tracking.setLocation("Seller Warehouse");
+		tracking.setDescription("Your order has been confirmed.");
 
-            product.setQuantity(
-                    product.getQuantity() + item.getQuantity());
+		orderTrackingRepository.save(tracking);
 
-            productRepository.save(product);
-        }
+		order.getTrackingHistory().add(tracking);
 
-        return orderRepository.save(order);
-    }
+		order.setSellerPrice(sellerPrice);
 
-  
+		order.setCustomerPaidAmount(customerPaid);
 
+		order.setShopkartContribution(shopkartContribution);
 
+		order.setPlatformFeePercentage(platformFeePercentage);
 
-    @Override
-    public List<Order> getAllOrders() {
+		order.setPlatformFeeAmount(totalPlatformFee);
 
-        return orderRepository.findAll();
+		order.setSellerNetProfit(totalSellerNetProfit);
 
-    }
-    
-    @Override
-    @Transactional
-    public Order updateOrder(Long orderId, Order request) {
+		order.setSellerPaymentStatus("PENDING");
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new RuntimeException("Order Not Found"));
+		orderRepository.save(order);
 
-        // Update Order
-        order.setDeliveryName(request.getDeliveryName());
-        order.setDeliveryMobile(request.getDeliveryMobile());
-        order.setDeliveryAddress(request.getDeliveryAddress());
-        order.setDeliveryCity(request.getDeliveryCity());
-        order.setDeliveryState(request.getDeliveryState());
-        order.setDeliveryPincode(request.getDeliveryPincode());
+		orderRepository.save(order);
 
-        orderRepository.save(order);
+		cartRepository.deleteByUserId(user.getId());
 
-        // Update Customer Address
-        User user = order.getUser();
+		return order;
+	}
 
-        List<Address> addresses = addressRepository.findByUserId(user.getId());
+	@Override
+	public List<Order> getOrdersByUser(Long userId) {
 
-        if (!addresses.isEmpty()) {
+		return orderRepository.findByUserId(userId);
+	}
 
-            Address address = addresses.get(0);
+	@Override
+	public List<Order> getOrdersBySeller(Long sellerId) {
 
-            address.setFullName(request.getDeliveryName());
-            address.setMobile(request.getDeliveryMobile());
-            address.setFullAddress(request.getDeliveryAddress());
-            address.setCity(request.getDeliveryCity());
-            address.setState(request.getDeliveryState());
-            address.setPincode(request.getDeliveryPincode());
+		return orderRepository.findBySellerSellerId(sellerId);
+	}
 
-            addressRepository.save(address);
-        }
+	@Override
+	public Order getOrderById(Long orderId) {
 
-        return order;
-    }
-    
-    @Override
-    public Order updateDeliveryAddress(
+		return orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+	}
 
-            Long orderId,
+	@Override
+	public Order cancelOrder(Long orderId) {
 
-            UpdateDeliveryRequest request){
+		Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow();
+		// Update current order status
+		order.setStatus(TrackingStatus.CANCELLED);
 
-        if(order.getStatus() != TrackingStatus.ORDER_CONFIRMED){
+		// Create tracking history
+		OrderTracking tracking = new OrderTracking();
 
-            throw new RuntimeException(
-                "Address can only be changed before packing."
-            );
+		tracking.setOrder(order);
+		tracking.setStatus(TrackingStatus.CANCELLED);
+		tracking.setLocation("System");
+		tracking.setDescription("Order has been cancelled.");
 
-        }
+		orderTrackingRepository.save(tracking);
 
-        order.setDeliveryName(request.getDeliveryName());
-        order.setDeliveryMobile(request.getDeliveryMobile());
-        order.setDeliveryAddress(request.getDeliveryAddress());
-        order.setDeliveryCity(request.getDeliveryCity());
-        order.setDeliveryState(request.getDeliveryState());
-        order.setDeliveryPincode(request.getDeliveryPincode());
+		order.getTrackingHistory().add(tracking);
 
-        return orderRepository.save(order);
+		// Restore stock
+		List<OrderItem> items = orderItemRepository.findByOrder(order);
 
-    }
-    
-    
-    
-    
+		for (OrderItem item : items) {
+
+			Product product = item.getProduct();
+
+			product.setQuantity(product.getQuantity() + item.getQuantity());
+
+			productRepository.save(product);
+		}
+
+		return orderRepository.save(order);
+	}
+
+	@Override
+	public List<Order> getAllOrders() {
+
+		return orderRepository.findAll();
+
+	}
+
+	@Override
+	@Transactional
+	public Order updateOrder(Long orderId, Order request) {
+
+		Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order Not Found"));
+
+		// Update Order
+		order.setDeliveryName(request.getDeliveryName());
+		order.setDeliveryMobile(request.getDeliveryMobile());
+		order.setDeliveryAddress(request.getDeliveryAddress());
+		order.setDeliveryCity(request.getDeliveryCity());
+		order.setDeliveryState(request.getDeliveryState());
+		order.setDeliveryPincode(request.getDeliveryPincode());
+
+		orderRepository.save(order);
+
+		// Update Customer Address
+		User user = order.getUser();
+
+		List<Address> addresses = addressRepository.findByUserId(user.getId());
+
+		if (!addresses.isEmpty()) {
+
+			Address address = addresses.get(0);
+
+			address.setFullName(request.getDeliveryName());
+			address.setMobile(request.getDeliveryMobile());
+			address.setFullAddress(request.getDeliveryAddress());
+			address.setCity(request.getDeliveryCity());
+			address.setState(request.getDeliveryState());
+			address.setPincode(request.getDeliveryPincode());
+
+			addressRepository.save(address);
+		}
+
+		return order;
+	}
+
+	@Override
+	public Order updateDeliveryAddress(
+
+			Long orderId,
+
+			UpdateDeliveryRequest request) {
+
+		Order order = orderRepository.findById(orderId).orElseThrow();
+
+		if (order.getStatus() != TrackingStatus.ORDER_CONFIRMED) {
+
+			throw new RuntimeException("Address can only be changed before packing.");
+
+		}
+
+		order.setDeliveryName(request.getDeliveryName());
+		order.setDeliveryMobile(request.getDeliveryMobile());
+		order.setDeliveryAddress(request.getDeliveryAddress());
+		order.setDeliveryCity(request.getDeliveryCity());
+		order.setDeliveryState(request.getDeliveryState());
+		order.setDeliveryPincode(request.getDeliveryPincode());
+
+		orderRepository.save(order);
+
+		// Update customer's default address
+		User user = order.getUser();
+
+		List<Address> addresses = addressRepository.findByUserId(user.getId());
+
+		if (!addresses.isEmpty()) {
+
+			Address address = addresses.get(0);
+
+			address.setFullName(request.getDeliveryName());
+			address.setMobile(request.getDeliveryMobile());
+			address.setFullAddress(request.getDeliveryAddress());
+			address.setCity(request.getDeliveryCity());
+			address.setState(request.getDeliveryState());
+			address.setPincode(request.getDeliveryPincode());
+
+			addressRepository.save(address);
+		}
+
+		return order;
+
+	}
+
+	@Override
+	public Order paySeller(Long orderId, SellerPaymentRequest request) {
+
+		Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+
+		if (!"SUCCESS".equals(order.getPaymentStatus())) {
+
+			throw new RuntimeException("Customer payment is not completed.");
+
+		}
+
+		if ("PAID".equals(order.getSellerPaymentStatus())) {
+
+			throw new RuntimeException("Seller has already been paid.");
+
+		}
+
+		
+		if (order.getStatus() == TrackingStatus.CANCELLED) {
+
+		    throw new RuntimeException(
+		            "Cancelled order cannot be paid.");
+
+		}
+
+		if (order.getShopkartContribution() == null
+		        || order.getShopkartContribution() <= 0) {
+
+		    throw new RuntimeException(
+		            "No ShopKart contribution to pay.");
+
+		}
+		
+		order.setSellerPaymentStatus("PAID");
+
+		order.setSellerPaymentMethod(request.getPaymentMethod());
+
+		order.setSellerTransactionId(request.getTransactionId());
+
+		order.setSellerPaymentDate(LocalDateTime.now());
+
+		return orderRepository.save(order);
+	}
 }
-    
-    
-    

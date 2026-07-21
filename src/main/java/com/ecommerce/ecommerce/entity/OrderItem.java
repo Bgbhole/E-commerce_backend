@@ -182,7 +182,7 @@ import jakarta.persistence.ManyToOne;
 				this.price = price;
 			}
 	
-		    // getters & setters
+		  
 		
 		    
 		    

@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce.service;
 import java.util.List;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.ecommerce.dto.SellerPaymentRequest;
 import com.ecommerce.ecommerce.dto.UpdateDeliveryRequest;
 import com.ecommerce.ecommerce.entity.Order;
 
@@ -24,6 +25,8 @@ public interface OrderService {
 		Order updateOrder(Long orderId, Order order);
 
 		Order updateDeliveryAddress(Long orderId, UpdateDeliveryRequest request);
+
+		Order paySeller(Long orderId, SellerPaymentRequest request);
 
 
 		

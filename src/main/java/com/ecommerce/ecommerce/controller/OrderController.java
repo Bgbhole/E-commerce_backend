@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ecommerce.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.ecommerce.dto.SellerPaymentRequest;
 import com.ecommerce.ecommerce.dto.UpdateDeliveryRequest;
 import com.ecommerce.ecommerce.entity.Order;
 import com.ecommerce.ecommerce.entity.OrderItem;
@@ -117,4 +118,21 @@ public class OrderController {
 
     }
 
+    @GetMapping("/payments")
+    public List<Order> getPayments() {
+
+        return orderService.getAllOrders();
+
+    }
+    
+    @PutMapping("/pay-seller/{orderId}")
+    public Order paySeller(
+
+            @PathVariable Long orderId,
+
+            @RequestBody SellerPaymentRequest request) {
+
+        return orderService.paySeller(orderId, request);
+
+    }
 }

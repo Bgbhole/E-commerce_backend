@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -93,12 +94,30 @@ public class SellerController {
     		seller.setCategory(category);
     		seller.setProductType(productType);
 
-    		seller.setShopLogo(shopLogo.getOriginalFilename());
+    		// Create uploads folder if it doesn't exist
+    		String uploadDir = "uploads/";
 
-    		seller.setShopFrontPhoto(shopFrontPhoto.getOriginalFilename());
+    		File dir = new File(uploadDir);
+    		if (!dir.exists()) {
+    		    dir.mkdirs();
+    		}
 
-    		seller.setShopInsidePhoto(shopInsidePhoto.getOriginalFilename());
+    		// Save Shop Logo
+    		String logoName = System.currentTimeMillis() + "_" + shopLogo.getOriginalFilename();
+    		shopLogo.transferTo(new File(uploadDir + logoName));
 
+    		// Save Shop Front Photo
+    		String frontName = System.currentTimeMillis() + "_" + shopFrontPhoto.getOriginalFilename();
+    		shopFrontPhoto.transferTo(new File(uploadDir + frontName));
+
+    		// Save Shop Inside Photo
+    		String insideName = System.currentTimeMillis() + "_" + shopInsidePhoto.getOriginalFilename();
+    		shopInsidePhoto.transferTo(new File(uploadDir + insideName));
+
+    		// Save file names in database
+    		seller.setShopLogo(logoName);
+    		seller.setShopFrontPhoto(frontName);
+    		seller.setShopInsidePhoto(insideName);
     		seller.setGstNumber(gstNumber);
     		seller.setPanNumber(panNumber);
 

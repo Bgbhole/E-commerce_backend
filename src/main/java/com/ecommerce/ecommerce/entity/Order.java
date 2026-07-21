@@ -85,6 +85,28 @@ public class Order {
 
     private String shopName;
     
+    private Double sellerAmount;
+
+    private Double adminCommission;
+
+    private String sellerPaymentStatus;
+
+    private LocalDateTime sellerPaymentDate;
+
+    private String sellerTransactionId;
+    
+    private String sellerPaymentMethod;
+    
+    private Double sellerPrice;              // Original seller price
+    private Double customerPaidAmount;       // Amount paid by customer
+    private Double shopkartContribution;     // Discount funded by ShopKart
+
+   
+    private Double platformFeePercentage;
+
+    private Double platformFeeAmount;
+
+    private Double sellerNetProfit;
     // Getters and Setters
     
     
@@ -257,4 +279,101 @@ public class Order {
     public void setSeller(Seller seller) {
         this.seller = seller;
     }
+    
+    public Double getSellerAmount() {
+        return sellerAmount;
+    }
+
+    public void setSellerAmount(Double sellerAmount) {
+        this.sellerAmount = sellerAmount;
+    }
+
+    public Double getAdminCommission() {
+        return adminCommission;
+    }
+
+    public void setAdminCommission(Double adminCommission) {
+        this.adminCommission = adminCommission;
+    }
+
+    public String getSellerPaymentStatus() {
+        return sellerPaymentStatus;
+    }
+
+    public void setSellerPaymentStatus(String sellerPaymentStatus) {
+        this.sellerPaymentStatus = sellerPaymentStatus;
+    }
+
+    public LocalDateTime getSellerPaymentDate() {
+        return sellerPaymentDate;
+    }
+
+    public void setSellerPaymentDate(LocalDateTime sellerPaymentDate) {
+        this.sellerPaymentDate = sellerPaymentDate;
+    }
+
+    public String getSellerTransactionId() {
+        return sellerTransactionId;
+    }
+
+    public void setSellerTransactionId(String sellerTransactionId) {
+        this.sellerTransactionId = sellerTransactionId;
+    }
+
+    public String getSellerPaymentMethod() {
+        return sellerPaymentMethod;
+    }
+
+    public void setSellerPaymentMethod(String sellerPaymentMethod) {
+        this.sellerPaymentMethod = sellerPaymentMethod;
+    }
+    
+    public Double getSellerPrice() {
+        return sellerPrice;
+    }
+
+    public void setSellerPrice(Double sellerPrice) {
+        this.sellerPrice = sellerPrice;
+    }
+
+    public Double getCustomerPaidAmount() {
+        return customerPaidAmount;
+    }
+
+    public void setCustomerPaidAmount(Double customerPaidAmount) {
+        this.customerPaidAmount = customerPaidAmount;
+    }
+
+    public Double getShopkartContribution() {
+        return shopkartContribution;
+    }
+
+    public void setShopkartContribution(Double shopkartContribution) {
+        this.shopkartContribution = shopkartContribution;
+    }
+
+    public Double getPlatformFeePercentage() {
+        return platformFeePercentage;
+    }
+
+    public void setPlatformFeePercentage(Double platformFeePercentage) {
+        this.platformFeePercentage = platformFeePercentage;
+    }
+
+    public Double getPlatformFeeAmount() {
+        return platformFeeAmount;
+    }
+
+    public void setPlatformFeeAmount(Double platformFeeAmount) {
+        this.platformFeeAmount = platformFeeAmount;
+    }
+
+    public Double getSellerNetProfit() {
+        return sellerNetProfit;
+    }
+
+    public void setSellerNetProfit(Double sellerNetProfit) {
+        this.sellerNetProfit = sellerNetProfit;
+    }
+
 }

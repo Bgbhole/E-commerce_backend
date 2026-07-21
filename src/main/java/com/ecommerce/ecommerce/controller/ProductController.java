@@ -63,6 +63,10 @@ public class ProductController {
 	        @RequestParam double sellingPrice,
 	        @RequestParam int quantity,
 	        @RequestParam double gstPercentage,
+	        
+	        @RequestParam Double platformFeePercentage,
+	        @RequestParam Double platformFeeAmount,
+	        @RequestParam Double sellerNetProfit,
 
 	        // Common
 	        @RequestParam(required = false) String color,
@@ -288,6 +292,12 @@ public class ProductController {
 	    product.setSellerPrice(sellingPrice);
 	    product.setSellerProfit(profit);
 	    product.setFinalSellingPrice(finalPrice);
+	    
+	    product.setPlatformFeePercentage(platformFeePercentage);
+
+	    product.setPlatformFeeAmount(platformFeeAmount);
+
+	    product.setSellerNetProfit(sellerNetProfit);
 
 	    product.setAdminDiscount(0.0);
 	    product.setDiscountAmount(0.0);
@@ -357,6 +367,15 @@ public class ProductController {
 
         old.setPurchasePrice(product.getPurchasePrice());
         old.setSellingPrice(product.getSellingPrice());
+        
+        old.setPlatformFeePercentage(
+                product.getPlatformFeePercentage());
+
+        old.setPlatformFeeAmount(
+                product.getPlatformFeeAmount());
+
+        old.setSellerNetProfit(
+                product.getSellerNetProfit());
 
         old.setQuantity(product.getQuantity());
 
