@@ -112,6 +112,11 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		order.setTrackingNumber(System.currentTimeMillis());
+		
+		String transactionId =
+		        "SKPAY-" + order.getTrackingNumber();
+
+		order.setSellerTransactionId(transactionId);
 
 		// Delivery Address
 		order.setDeliveryName(deliveryAddress.getFullName());
@@ -370,12 +375,6 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = orderRepository.findById(orderId).orElseThrow();
 
-		if (order.getStatus() != TrackingStatus.ORDER_CONFIRMED) {
-
-			throw new RuntimeException("Address can only be changed before packing.");
-
-		}
-
 		order.setDeliveryName(request.getDeliveryName());
 		order.setDeliveryMobile(request.getDeliveryMobile());
 		order.setDeliveryAddress(request.getDeliveryAddress());
@@ -424,15 +423,18 @@ public class OrderServiceImpl implements OrderService {
 			throw new RuntimeException("Seller has already been paid.");
 
 		}
-
 		
-		if (order.getStatus() == TrackingStatus.CANCELLED) {
-
+		if (order.getStatus() != TrackingStatus.DELIVERED) {
 		    throw new RuntimeException(
-		            "Cancelled order cannot be paid.");
-
+		        "Seller payment is allowed only after delivery.");
 		}
 
+		if (order.getStatus() == TrackingStatus.CANCELLED) {
+		    throw new RuntimeException(
+		        "Cancelled orders cannot be paid.");
+		}
+
+		
 		if (order.getShopkartContribution() == null
 		        || order.getShopkartContribution() <= 0) {
 
@@ -442,10 +444,17 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		order.setSellerPaymentStatus("PAID");
+		
+	
+
+		if (request.getPaymentMethod() == null
+		        || request.getPaymentMethod().trim().isEmpty()) {
+
+		    throw new RuntimeException("Payment method is required.");
+
+		}
 
 		order.setSellerPaymentMethod(request.getPaymentMethod());
-
-		order.setSellerTransactionId(request.getTransactionId());
 
 		order.setSellerPaymentDate(LocalDateTime.now());
 

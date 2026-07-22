@@ -16,4 +16,10 @@ public interface SellerService {
     Seller updateSeller(Long sellerId, Seller seller);
 
     void deleteSeller(Long sellerId);
+
+	String forgotPassword(String email);
+
+	boolean verifyForgotOtp(String email, String otp);
+
+	String resetPassword(String email, String newPassword);
 }

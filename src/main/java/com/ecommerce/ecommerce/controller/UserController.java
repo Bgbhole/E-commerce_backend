@@ -84,4 +84,28 @@ public class UserController {
 
     }
     
+    @PostMapping("/forgot-password")
+    public String forgotPassword(
+            @RequestParam String email){
+
+        return userService.forgotPassword(email);
+
+    }
+    
+    @PostMapping("/verify-forgot-otp")
+    public boolean verifyForgotOtp(
+            @RequestParam String email,
+            @RequestParam String otp){
+
+        return userService.verifyForgotOtp(email, otp);
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword){
+
+        return userService.resetPassword(email, newPassword);
+    }
+    
 }

@@ -116,4 +116,67 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
 
     }
+
+    @Override
+    public String forgotPassword(String email) {
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Email not found"));
+
+        String otp = String.valueOf(
+                100000 + new Random().nextInt(900000));
+
+        user.setOtp(otp);
+        user.setOtpExpiry(
+                LocalDateTime.now().plusMinutes(5));
+
+        userRepository.save(user);
+
+        System.out.println("Forgot Password OTP : " + otp);
+
+        return "OTP Generated Successfully";
+    }
+
+    @Override
+    public boolean verifyForgotOtp(String email, String otp) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        if (user.getOtp() == null) {
+            return false;
+        }
+
+        if (!user.getOtp().equals(otp)) {
+            return false;
+        }
+
+        if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String resetPassword(String email, String newPassword) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+
+        userRepository.save(user);
+
+        return "Password Reset Successfully";
+    }
+    
+ 
+
+  
 }

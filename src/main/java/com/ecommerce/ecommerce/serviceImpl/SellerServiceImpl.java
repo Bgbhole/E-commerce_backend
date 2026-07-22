@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.serviceImpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class SellerServiceImpl implements SellerService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+ 
+    
     @Override
     public Seller registerSeller(Seller seller) {
 
@@ -131,5 +135,69 @@ public class SellerServiceImpl implements SellerService {
 	    sellerRepository.deleteById(sellerId);
 	}
 
+	@Override
+	public String forgotPassword(String email) {
+
+	    Seller seller = sellerRepository
+	            .findByEmail(email)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Email not found"));
+
+	    String otp =
+	            String.valueOf(100000 + (int)(Math.random() * 900000));
+
+	    seller.setOtp(otp);
+	    seller.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+	    sellerRepository.save(seller);
+
+	    // Print OTP in console instead of sending email
+	    System.out.println("Seller OTP : " + otp);
+
+	    return "OTP Generated Successfully";
+	}
+
+
+	@Override
+	public boolean verifyForgotOtp(String email, String otp) {
+
+	    Seller seller = sellerRepository.findByEmail(email)
+	            .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+	    if (seller.getOtp() == null) {
+	        return false;
+	    }
+
+	    if (!seller.getOtp().equals(otp)) {
+	        return false;
+	    }
+
+	    if (seller.getOtpExpiry().isBefore(LocalDateTime.now())) {
+	        return false;
+	    }
+
+	    return true;
+	}
+
+
+
+@Override
+public String resetPassword(String email, String newPassword) {
+
+    Seller seller = sellerRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+    seller.setPassword(passwordEncoder.encode(newPassword));
+
+    seller.setOtp(null);
+    seller.setOtpExpiry(null);
+
+    sellerRepository.save(seller);
+
+    return "Password Reset Successfully";
+}
+	
+	
+	
 	
 }

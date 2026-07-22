@@ -2,6 +2,9 @@ package com.ecommerce.ecommerce.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,24 +98,23 @@ public class SellerController {
     		seller.setProductType(productType);
 
     		// Create uploads folder if it doesn't exist
-    		String uploadDir = "uploads/";
+    		Path uploadDir = Paths.get("uploads");
 
-    		File dir = new File(uploadDir);
-    		if (!dir.exists()) {
-    		    dir.mkdirs();
+    		if (!Files.exists(uploadDir)) {
+    		    Files.createDirectories(uploadDir);
     		}
 
     		// Save Shop Logo
     		String logoName = System.currentTimeMillis() + "_" + shopLogo.getOriginalFilename();
-    		shopLogo.transferTo(new File(uploadDir + logoName));
+    		shopLogo.transferTo(uploadDir.resolve(logoName).toFile());
 
     		// Save Shop Front Photo
     		String frontName = System.currentTimeMillis() + "_" + shopFrontPhoto.getOriginalFilename();
-    		shopFrontPhoto.transferTo(new File(uploadDir + frontName));
+    		shopFrontPhoto.transferTo(uploadDir.resolve(frontName).toFile());
 
     		// Save Shop Inside Photo
     		String insideName = System.currentTimeMillis() + "_" + shopInsidePhoto.getOriginalFilename();
-    		shopInsidePhoto.transferTo(new File(uploadDir + insideName));
+    		shopInsidePhoto.transferTo(uploadDir.resolve(insideName).toFile());
 
     		// Save file names in database
     		seller.setShopLogo(logoName);
@@ -225,6 +227,33 @@ public class SellerController {
 
     }
     
+    @PostMapping("/forgot-password")
+    public String forgotPassword(
+            @RequestParam String email){
+
+        return sellerService
+                .forgotPassword(email);
+
+    }
     
+    @PostMapping("/verify-forgot-otp")
+    public boolean verifyForgotOtp(
+            @RequestParam String email,
+            @RequestParam String otp){
+
+        System.out.println("verify-forgot-otp endpoint hit");
+
+        return sellerService.verifyForgotOtp(email, otp);
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword){
+
+        System.out.println("reset-password endpoint hit");
+
+        return sellerService.resetPassword(email, newPassword);
+    }
     
 }
