@@ -460,4 +460,23 @@ public class OrderServiceImpl implements OrderService {
 
 		return orderRepository.save(order);
 	}
+
+	@Override
+	public Order markAsPacked(Long orderId) {
+
+	    Order order = orderRepository.findById(orderId)
+	            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+	    if (order.getStatus() != TrackingStatus.ORDER_CONFIRMED) {
+	        throw new RuntimeException("Only confirmed orders can be packed.");
+	    }
+
+	    order.setStatus(TrackingStatus.PACKED);
+
+	    order.setParcelBookingRequested(true);
+
+	    order.setPackedDate(LocalDateTime.now());
+
+	    return orderRepository.save(order);
+	}
 }

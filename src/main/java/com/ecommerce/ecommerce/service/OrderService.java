@@ -28,6 +28,8 @@ public interface OrderService {
 
 		Order paySeller(Long orderId, SellerPaymentRequest request);
 
+		Order markAsPacked(Long orderId);
+
 
 		
 

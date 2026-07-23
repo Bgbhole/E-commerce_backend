@@ -2,7 +2,7 @@ package com.ecommerce.ecommerce.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
 
 import com.ecommerce.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.ecommerce.repository.ProductRepository;
@@ -14,7 +14,6 @@ import com.ecommerce.ecommerce.enums.SellerStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
@@ -356,117 +355,7 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody Product product) {
 
-        Product old = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product Not Found"));
-
-        // Basic
-        old.setProductName(product.getProductName());
-        old.setDescription(product.getDescription());
-        old.setBrand(product.getBrand());
-        old.setCategory(product.getCategory());
-
-        old.setPurchasePrice(product.getPurchasePrice());
-        old.setSellingPrice(product.getSellingPrice());
-        
-        old.setPlatformFeePercentage(
-                product.getPlatformFeePercentage());
-
-        old.setPlatformFeeAmount(
-                product.getPlatformFeeAmount());
-
-        old.setSellerNetProfit(
-                product.getSellerNetProfit());
-
-        old.setQuantity(product.getQuantity());
-
-        old.setGstPercentage(product.getGstPercentage());
-        old.setProfit(product.getProfit());
-        old.setGstAmount(product.getGstAmount());
-        old.setFinalPrice(product.getFinalPrice());
-
-        // Common
-        old.setColor(product.getColor());
-        old.setWeight(product.getWeight());
-        old.setWarranty(product.getWarranty());
-        old.setModel(product.getModel());
-
-        // Mobile
-        old.setRam(product.getRam());
-        old.setStorage(product.getStorage());
-        old.setProcessor(product.getProcessor());
-        old.setBattery(product.getBattery());
-        old.setCamera(product.getCamera());
-        old.setDisplay(product.getDisplay());
-        old.setOperatingSystem(product.getOperatingSystem());
-        old.setNetwork(product.getNetwork());
-
-        // Electronics
-        old.setVoltage(product.getVoltage());
-        old.setPower(product.getPower());
-        old.setConnectivity(product.getConnectivity());
-
-        // Fashion
-        old.setSize(product.getSize());
-        old.setMaterial(product.getMaterial());
-        old.setFabric(product.getFabric());
-        old.setGender(product.getGender());
-        old.setFit(product.getFit());
-        old.setPattern(product.getPattern());
-        old.setSleeve(product.getSleeve());
-        old.setWashCare(product.getWashCare());
-
-        // Furniture
-        old.setDimensions(product.getDimensions());
-        old.setFinish(product.getFinish());
-        old.setAssembly(product.getAssembly());
-        old.setRoomType(product.getRoomType());
-
-        // Books
-        old.setAuthor(product.getAuthor());
-        old.setPublisher(product.getPublisher());
-        old.setLanguage(product.getLanguage());
-        old.setPages(product.getPages());
-        old.setIsbn(product.getIsbn());
-        old.setEdition(product.getEdition());
-        old.setBinding(product.getBinding());
-        old.setPublicationYear(product.getPublicationYear());
-
-        // Grocery
-        old.setManufacturer(product.getManufacturer());
-        old.setExpiryDate(product.getExpiryDate());
-        old.setStorageInstruction(product.getStorageInstruction());
-        old.setCountry(product.getCountry());
-        old.setOrganic(product.getOrganic());
-        old.setVeg(product.getVeg());
-
-        // Beauty
-        old.setSkinType(product.getSkinType());
-        old.setHairType(product.getHairType());
-        old.setIngredients(product.getIngredients());
-        old.setBenefits(product.getBenefits());
-        old.setNetQuantity(product.getNetQuantity());
-
-        // Sports
-        old.setSportType(product.getSportType());
-        old.setAgeGroup(product.getAgeGroup());
-
-        // Toys
-        old.setToyAge(product.getToyAge());
-        old.setBatteryRequired(product.getBatteryRequired());
-        old.setEducational(product.getEducational());
-        old.setSafety(product.getSafety());
-
-        // If quantity becomes available again
-        if (old.getQuantity() > 0 && old.getStatus() == ProductStatus.OUT_OF_STOCK) {
-            old.setStatus(ProductStatus.ACTIVE);
-        }
-
-        // If quantity becomes zero
-        if (old.getQuantity() <= 0) {
-            old.setStatus(ProductStatus.OUT_OF_STOCK);
-        }
-
-        return productRepository.save(old);
+        return productService.updateProduct(productId, product);
     }
     
     @GetMapping("/image/{id}")

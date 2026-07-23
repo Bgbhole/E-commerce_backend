@@ -135,4 +135,11 @@ public class OrderController {
         return orderService.paySeller(orderId, request);
 
     }
+    
+    @PutMapping("/seller/{orderId}/packed")
+    public Order markAsPacked(@PathVariable Long orderId) {
+
+        return orderService.markAsPacked(orderId);
+
+    }
 }

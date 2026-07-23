@@ -27,6 +27,10 @@ public class Order {
     private String paymentMethod;
 
     private double totalAmount;
+    
+    private boolean parcelBookingRequested = false;
+
+    private LocalDateTime packedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -374,6 +378,22 @@ public class Order {
 
     public void setSellerNetProfit(Double sellerNetProfit) {
         this.sellerNetProfit = sellerNetProfit;
+    }
+
+    public boolean isParcelBookingRequested() {
+        return parcelBookingRequested;
+    }
+
+    public void setParcelBookingRequested(boolean parcelBookingRequested) {
+        this.parcelBookingRequested = parcelBookingRequested;
+    }
+
+    public LocalDateTime getPackedDate() {
+        return packedDate;
+    }
+
+    public void setPackedDate(LocalDateTime packedDate) {
+        this.packedDate = packedDate;
     }
 
 }
